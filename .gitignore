@@ -1,0 +1,7 @@
+.credentials.json
+.claude.json
+.env
+.env.*
+*.key
+*.pem
+.DS_Store
