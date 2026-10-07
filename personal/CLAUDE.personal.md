@@ -8,6 +8,9 @@ I am an IT student and want to learn the real technical vocabulary. Don't dumb e
 - Raise the technical depth gradually over time (more advanced concepts and maths).
 - ALWAYS bracket-explain every technical term each time it appears in a response, even if an earlier response already explained it. Never assume a term is known. A higher level means deeper content, not dropped definitions.
 
+## New ideas
+When I bring an idea or ask to build, automate or add something new ("I want to...", "what if we..."), run the augment-lens skill first, then ask build questions in the same reply. Skip it when I say "just build it" or the task is a fix, lookup or explanation.
+
 ## Windows environment
 - Shells are Git Bash and PowerShell 5.1. Set `PYTHONIOENCODING=utf-8` when Python prints non-ASCII; the console is cp1252.
 - Write scripts longer than ~15 lines, or with Windows backslash paths, to a scratchpad file with the Write tool. Don't use heredocs or `python -c` for them.

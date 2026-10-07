@@ -1,6 +1,6 @@
 ---
 name: augment-lens
-description: "Check an idea, a project change or a discussion topic with the automation-vs-augmentation lens: which parts should be fully automated, which should amplify a human who keeps the judgment, where the human must stay sharp, and what can go wrong (so-so automation, automation bias, deskilling). Ends with a short verdict, a better shape of the idea and a first step. Use whenever the user presents an idea ('I want to build/automate/add X', 'what if we...', 'thinking about...'), proposes a change to a project, tool or workflow, or wants to discuss or evaluate a plan, even if they never mention automation or augmentation; also on /augment-lens. Skip for factual lookups, plain bug fixes, explanations, and work the user has already decided and only wants done. For a high-stakes choice between several options, llm-council is the heavier tool; augment-lens can run first as a quick pass."
+description: "Run this FIRST, before any clarifying questions, plan or code, whenever the user brings an idea or asks to build, automate, add or change something new ('I want to auto-reply to emails', 'I want to build/automate/add X', 'what if we...', 'thinking about...', 'let's add...', 'can we make X do Y on its own'), proposes a change to a project, tool or workflow, or wants to evaluate a plan, even if they never mention automation; also on /augment-lens. 'I want X' is an idea to check, not a decided task. It is a short automation-vs-augmentation pass: which parts to automate, which to keep with a human who decides, the risks (so-so automation, automation bias, deskilling), a verdict and a first step. Skip only for factual lookups, explanations, bug fixes, trivial edits, or when the user says to skip the review ('just build it', 'skip the lens'). For a high-stakes choice between several options, llm-council is the heavier tool; augment-lens can run first as a quick pass."
 ---
 
 # Augment lens
@@ -55,6 +55,8 @@ Keep it short. Use this shape:
 **First step:** <one concrete action>
 **Metric:** <what to measure>
 ```
+
+When the user also wants the idea built, put this output first and the build questions after it, in the same message. Answer their choices in the light of the verdict (e.g. recommend "draft for review" when the lens says "augment").
 
 ## Rules
 

@@ -1,0 +1,28 @@
+{
+  "should_trigger": [
+    "I want to auto-reply to vendor emails",
+    "what if we cache the RADIUS accounting logs in Redis?",
+    "thinking about adding a Telegram bot that alerts me when an AP goes down",
+    "can we make the AP compliance report send itself to the vendors every Monday?",
+    "I want to build a tool that grades my friends' lab reports automatically",
+    "let's add an AI chatbot to the campus Wi-Fi help page",
+    "I'm planning to let Claude commit and push to my repos on its own after each task",
+    "idea: auto-generate my GATE study plan every week from my mock test scores",
+    "I want to automate the student device registration so nobody approves it by hand",
+    "should we replace the manual Wi-Fi survey with a script that reads AP signal logs?",
+    "I'd like Claude to summarise all my emails each morning and archive the unimportant ones",
+    "what do you think about auto-revoking a student's Wi-Fi access when they exceed 3 devices?"
+  ],
+  "should_not_trigger": [
+    "fix the typo 'recieve' in README.md",
+    "explain how EAP-TLS works",
+    "what port does RADIUS accounting use?",
+    "just build the vendor auto-reply script now, skip any review, I've decided",
+    "/explain Claude Code hooks",
+    "rename the function get_ap to fetch_ap in aaa.py",
+    "what is the difference between WPA2 and WPA3?",
+    "convert this list to a markdown table: AP1 101, AP2 102, AP3 103",
+    "why does git say 'detached HEAD'?",
+    "summarise the main idea of the OSI model in 3 lines"
+  ]
+}
