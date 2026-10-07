@@ -66,6 +66,7 @@ Ask before implementing when:
 - The task can't be inferred from the arguments or context you were given.
 
 Don't ask when code, config, docs, conventions, or the task itself already answer it. Decide, state the assumption in one line, and continue. Batch questions into one message.
+For design, planning or research tasks, put the hard constraints in the first batch: scale, per-user limits, budget, deadlines, compliance, audience and output format.
 
 ## Implementation Rules
 - Implement the approved plan or spec. If you must deviate, say why before doing it.
@@ -78,6 +79,7 @@ Don't ask when code, config, docs, conventions, or the task itself already answe
 - Keep functions small and focused. Prefer the simplest design that meets the requirements.
 - For large tasks, work in stages and get each stage working before starting the next.
 - UI from a design image: match the design and the existing theme, and change only the targeted section.
+- When data lacks labels or IDs, extend my existing naming pattern, confirm it once, and state it in the output. Don't invent a new scheme.
 
 ## Testing & Verification
 Verify in this order and stop when confidence is adequate for the task size:
@@ -142,6 +144,9 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - Report which tests and commands ran and their outcomes. Report failures and unverified areas honestly.
 - Flag uncertainty explicitly. Never present a guess as fact, and never invent files, APIs, commands, or results.
 - Don't ask permission for routine, safe, reversible operations. Always confirm high-impact or destructive ones first.
+- Write prose (explanations, summaries, plans, reports) about 80% of the way to ASD-STE100 Simplified Technical English: short sentences (≤20–25 words), active voice, one idea per sentence, common words with one meaning, no noun stacks over 3 words. Never simplify away technical precision; code, identifiers, commands and error text stay exact.
+- When a concept involves flow, structure or relationships, prefer a diagram over long prose. For comparisons or interactive exploration, offer an HTML page. For deeper explanations, use `/explain`.
+- In reports and research, label each claim as measured, sourced (with link), estimate (own arithmetic, assumptions stated) or inference (reasoned, not tested).
 
 ## Safety Rules
 - Never delete or overwrite user work, files, or data without confirmation.
@@ -150,6 +155,7 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - No destructive shell or Git commands (`rm -rf`, force push, hard reset) unless explicitly requested.
 - Treat production config, deployment settings, and CI as high-impact: change them only when asked, and call out the risk.
 - Never claim something works, passes, or is deployed without having verified it.
+- Before publishing or sharing any image, screenshot, PDF or page, check it for passwords, keys, tokens and personal data, and blur or crop them.
 
 ## Completion Checklist
 - [ ] Requirements and acceptance criteria met, each one checked

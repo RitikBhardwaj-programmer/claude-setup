@@ -5,7 +5,7 @@ set -euo pipefail
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST="$HOME/.claude"
-SKILLS="context-handoff context-handoff-deep graphify llm-council"
+SKILLS="context-handoff context-handoff-deep graphify llm-council explain report-publisher vendor-requirements-spec improve-setup"
 BACKUP="$DEST/backups/pre-shared-setup-$(date +%Y%m%d-%H%M%S)"
 
 mkdir -p "$DEST/skills"
@@ -47,5 +47,8 @@ fi
 echo ""
 echo "Note: /graphify needs Python 3. It installs its own package on first use,"
 echo "or you can run:  pip3 install graphifyy"
+echo ""
+echo "Note: report-publisher and vendor-requirements-spec need these Python packages"
+echo "(and Google Chrome for PDFs):  pip3 install markdown-it-py pypdfium2 openpyxl"
 echo ""
 echo "Done. Start a NEW Claude Code session to load the setup."

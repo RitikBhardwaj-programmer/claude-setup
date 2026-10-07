@@ -3,7 +3,7 @@
 This is my setup for **Claude Code** (the version of Claude that can work with files and code on your computer). It contains:
 
 - **`CLAUDE.md`**: my rulebook. Claude reads it at the start of every conversation and follows it, a bit like a job contract for an assistant. It makes Claude plan first, avoid guessing, test its work and never delete your stuff without asking.
-- **4 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
+- **8 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
 
 | Skill | What it does | How to use it |
 |---|---|---|
@@ -11,8 +11,12 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 | **context-handoff-deep** | A more thorough version that also double-checks the code and its history | say "deep handoff" |
 | **graphify** | Draws a mind-map of a project showing how all the files connect, so Claude can understand it quickly | type `/graphify` |
 | **llm-council** | Five helper Claudes look at a decision from different angles, judge each other's answers, and a "chairman" gives one final answer | say "council this" or ask "should I X or Y?" |
+| **explain** | Explains a topic, file or error in the clearest form: short plain prose, a diagram, or an interactive page | type `/explain <thing>` |
+| **report-publisher** | Turns a write-up into a professional web page and an A4 PDF, with diagrams and automatic layout checks | say "make a report/PDF of this" |
+| **vendor-requirements-spec** | Writes a requirement spec for a purchase (numbered MUST/SHOULD items, tests, questions) plus an Excel sheet vendors fill in | say "write the requirements for the vendor" |
+| **improve-setup** | Looks back at your recent Claude sessions, finds what went wrong or slowly, and proposes fixes to your rulebook and skills; builds only what you approve | type `/improve-setup` |
 
-Nothing private is in here: no passwords, no login keys, no project notes.
+Nothing private is in the parts the Mac installer uses: no passwords, no login keys, no project notes. The `personal/` folder is my own Windows PC's configuration; the Mac installer never touches it.
 
 ---
 
@@ -68,3 +72,28 @@ bash ~/claude-setup/install.sh
 - **Make it yours:** `~/.claude/CLAUDE.md` is just a text file. Open it with `open -e ~/.claude/CLAUDE.md` and change any rule you like.
 - **Optional settings I use:** dark theme, and automatic updates to the newest Claude version. You can set these in the app's Settings.
 - **Graphify rule in CLAUDE.md:** the rulebook tells Claude to use the project mind-map when one exists. If a project doesn't have one, Claude just works normally.
+
+---
+
+## For me: Windows PC and how this repo is managed
+
+This repo is the **source of truth** for my Claude setup. I never edit `~/.claude` directly.
+
+| Path | What it is | Installed on |
+|---|---|---|
+| `CLAUDE.md`, `skills/` | Shared rulebook and portable skills | Mac and Windows |
+| `personal/CLAUDE.personal.md` | My personal rules (explanation style, Windows shell, Brain vault, this workflow), appended to `CLAUDE.md` | Windows only |
+| `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
+| `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, retro nudge) and their registration | Windows only |
+| `personal/setup.json` | Per-machine paths read by the portable skills (Python, retro notes, notes repo, this repo) | Windows only |
+| `scripts/` | Windows installer logic and the drift check | — |
+
+Skills that are links in `~/.claude/skills` (for example `brain-review`, which lives in my Brain vault's git) are managed there; the installer never overwrites a link.
+
+**Change the setup:**
+1. Edit files here (shared part if it is portable and has nothing personal, else `personal/`).
+2. Install: `powershell -ExecutionPolicy Bypass -File install.ps1` (add `-DryRun` to preview). It backs up whatever it replaces to `~/.claude/backups/`, replaces only the `hooks` block of `settings.json`, and ends with a drift check.
+3. Check: `py -3 scripts/check_drift.py` must say "In sync".
+4. Commit and push.
+
+**On another machine (no `personal/`):** the portable skills fall back to defaults when `~/.claude/setup.json` is missing (`python3`, retro notes in `~/.claude/retros/`, no notes repo).

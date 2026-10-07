@@ -1,0 +1,68 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/DELL/.claude/tools/marker-venv/Scripts/python.exe\" \"C:/Users/DELL/.claude/hooks/pdf_router.py\" pretool",
+            "timeout": 30,
+            "statusMessage": "Choosing PDF reading method..."
+          }
+        ]
+      },
+      {
+        "matcher": "Artifact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3 \"C:/Users/DELL/.claude/hooks/artifact_secret_scan.py\"",
+            "timeout": 20,
+            "statusMessage": "Scanning for secrets before publishing..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Users/DELL/.claude/tools/marker-venv/Scripts/python.exe\" \"C:/Users/DELL/.claude/hooks/pdf_router.py\" prompt",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3 \"C:/Users/DELL/Brain/tools/hooks/session_start.py\"",
+            "timeout": 20,
+            "statusMessage": "Loading Brain vault context..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3 \"C:/Users/DELL/Brain/tools/hooks/stop_check.py\"",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "py -3 \"C:/Users/DELL/.claude/hooks/retro_nudge.py\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

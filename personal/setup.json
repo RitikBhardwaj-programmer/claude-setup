@@ -1,0 +1,11 @@
+{
+  "_comment": "Per-machine settings for the portable skills (installed to ~/.claude/setup.json on this Windows PC). Missing keys fall back to defaults: python3, ~/.claude/retros, no notes repo, no setup repo.",
+  "python": "C:/Users/DELL/.claude/tools/marker-venv/Scripts/python.exe",
+  "retros_dir": "C:/Users/DELL/Brain/Retros",
+  "notes_repo": "C:/Users/DELL/Brain",
+  "notes_log": "log.md",
+  "setup_repo": "C:/Users/DELL/claude-setup",
+  "setup_install": "powershell -ExecutionPolicy Bypass -File C:/Users/DELL/claude-setup/install.ps1",
+  "setup_check": "py -3 C:/Users/DELL/claude-setup/scripts/check_drift.py",
+  "commit_trailer": "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+}

@@ -1,0 +1,18 @@
+/* A4 print rules. Lessons: never mark big blocks (verdict boxes, whole tables) as
+   unbreakable, or a page is left almost empty; keep rows, figures and cards together. */
+@page { size: A4; margin: 14mm 12mm 16mm; }
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  section { margin-top: 16px; padding-block: 16px 4px; }
+  figure, .finding, .flow, pre.code, .score, tr, .chart { break-inside: avoid; }
+  h2, h3, section > header { break-after: avoid; }
+  .flow svg, .chart .svgbox svg { min-width: 0; }
+  .tbl { overflow: visible; }
+  table { font-size: 8.6pt; }
+  th, td { white-space: normal; padding: 4px 6px; }
+  pre.code { white-space: pre-wrap; font-size: 7.6pt; }
+  details > summary, .tip { display: none; }
+  a { color: var(--accent); text-decoration: none; }
+}
