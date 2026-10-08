@@ -3,7 +3,7 @@
 This is my setup for **Claude Code** (the version of Claude that can work with files and code on your computer). It contains:
 
 - **`CLAUDE.md`**: my rulebook. Claude reads it at the start of every conversation and follows it, a bit like a job contract for an assistant. It makes Claude plan first, avoid guessing, test its work and never delete your stuff without asking.
-- **10 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
+- **11 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
 
 | Skill | What it does | How to use it |
 |---|---|---|
@@ -17,6 +17,7 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 | **improve-setup** | Looks back at your recent Claude sessions, finds what went wrong or slowly, and proposes fixes to your rulebook and skills; builds only what you approve | type `/improve-setup` |
 | **youtube-transcript** | Gets the text of a YouTube video from its link (clean paragraphs with time marks), so Claude can summarise it or answer questions about it | paste a YouTube link and ask |
 | **intuition** | Teaches a topic or works through a problem the way physics teacher Mahesh Shenoy does: start from what is confusing, show why the obvious answer fails, find the real cause, and only then the formula. It can quiz you, explain, solve, or check your own explanation | type `/intuition <topic>` or say "build my intuition for X" |
+| **route** | Before a bigger job starts, picks which Claude model and how much "thinking effort" each part of the job gets (strong model to plan, cheaper one to build, cheapest to search), so your usage limit lasts longer. It can also hand self-contained parts to Codex if you have it | it runs by itself in plans, or type `/route` |
 
 Nothing private is in the parts the Mac installer uses: no passwords, no login keys, no project notes. The `personal/` folder is my own Windows PC's configuration; the Mac installer never touches it.
 

@@ -55,6 +55,7 @@ Plan contents, scaled to the task:
 - **Risks:** breaking changes, migrations, security, edge cases.
 - **Verification:** tests to write or run, commands, manual checks, mapped to acceptance criteria.
 - **Assumptions and open questions.**
+- **Routing card:** run the `route` skill and add its card (model, effort and agent per phase, plus Codex handoffs). After approval, carry it out.
 
 For large features without a spec, propose one first: problem statement, functional requirements, inputs/outputs, constraints, edge cases, acceptance criteria. Keep it technology-agnostic. The plan then covers the *how*.
 
