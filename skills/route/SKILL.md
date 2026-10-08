@@ -34,7 +34,7 @@ Rules:
 
 ## Step 3: Codex handoff candidates
 
-Only if `codex --version` works. Codex runs on the user's ChatGPT plan quota, not on Claude tokens. Offer a phase to Codex only when **all** of these are true:
+Only if the Codex CLI is installed: `codex --version` works in Bash, or on Windows `Get-Command codex` finds it in PowerShell (npm puts it in `%APPDATA%\npm`, which Git Bash may not have on PATH). The Codex desktop app alone is not enough: `codex exec` needs the CLI. If it is missing, write "none (Codex CLI not installed: `npm i -g @openai/codex`)" in the card. Codex runs on the user's ChatGPT plan quota, not on Claude tokens. Offer a phase to Codex only when **all** of these are true:
 1. It is self-contained: the brief can describe it without the repo's whole context.
 2. Its result is cheap to check: a test passes, a file exists, or a short skim is enough.
 3. The work is large compared with the brief: a research pass, a separate module, a second-opinion review.
