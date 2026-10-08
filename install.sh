@@ -5,7 +5,7 @@ set -euo pipefail
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST="$HOME/.claude"
-SKILLS="context-handoff context-handoff-deep graphify llm-council explain report-publisher vendor-requirements-spec improve-setup"
+SKILLS="context-handoff context-handoff-deep graphify llm-council explain report-publisher vendor-requirements-spec improve-setup route"
 BACKUP="$DEST/backups/pre-shared-setup-$(date +%Y%m%d-%H%M%S)"
 
 mkdir -p "$DEST/skills"
