@@ -40,7 +40,9 @@ Only if the Codex CLI is installed: `codex --version` works in Bash, or on Windo
 3. The work is large compared with the brief: a research pass, a separate module, a second-opinion review.
 4. No other agent writes the same files while it runs.
 
-The handoff command (non-interactive): `codex exec "<brief: goal, files, what done looks like, where to write the result>"`. Run long jobs in the background. Check the result before you report it as done.
+The handoff command (non-interactive): `codex exec -s <read-only|workspace-write> "<brief: goal, files, what done looks like, where to write the result>"`. Use `read-only` for reviews and questions, `workspace-write` only when it must create files. Run long jobs in the background. Check the result before you report it as done.
+
+Windows: if every Codex shell call fails with `helper_unknown_error: setup refresh had errors`, the config has `[windows] sandbox = "elevated"` (set up by the Codex desktop app; the CLI cannot refresh it). Add `-c 'windows.sandbox="unelevated"'` to the command. Do not edit the user's `config.toml`. Expect ~15k ChatGPT-quota tokens of overhead per call, so one larger handoff beats many small ones.
 
 Do not route anything through free third-party gateways (for example OmniRoute). The user parked that option on 2026-10-08 (security and data concerns).
 
