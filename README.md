@@ -3,7 +3,7 @@
 This is my setup for **Claude Code** (the version of Claude that can work with files and code on your computer). It contains:
 
 - **`CLAUDE.md`**: my rulebook. Claude reads it at the start of every conversation and follows it, a bit like a job contract for an assistant. It makes Claude plan first, avoid guessing, test its work and never delete your stuff without asking.
-- **11 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
+- **12 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
 
 | Skill | What it does | How to use it |
 |---|---|---|
@@ -18,6 +18,12 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 | **youtube-transcript** | Gets the text of a YouTube video from its link (clean paragraphs with time marks), so Claude can summarise it or answer questions about it | paste a YouTube link and ask |
 | **intuition** | Teaches a topic or works through a problem the way physics teacher Mahesh Shenoy does: start from what is confusing, show why the obvious answer fails, find the real cause, and only then the formula. It can quiz you, explain, solve, or check your own explanation | type `/intuition <topic>` or say "build my intuition for X" |
 | **route** | Before a bigger job starts, picks which Claude model and how much "thinking effort" each part of the job gets (strong model to plan, cheaper one to build, cheapest to search), so your usage limit lasts longer. It can also hand self-contained parts to Codex if you have it | it runs by itself in plans, or type `/route` |
+| **ui-design** | When Claude builds or restyles a web page, dashboard or app screen, it follows clear design rules (no generic "AI look", real colours and fonts from your project, accessibility), then looks at its own result in a browser at desktop, tablet and phone size and fixes what it sees | it runs by itself on UI work, or type `/ui-design` |
+
+- **1 helper agent** (a second Claude with its own fresh memory that does one job and reports back):
+  - **design-review**: checks a finished screen like a senior designer would (flows, three screen sizes, polish, accessibility, error and empty states) and lists problems from "Blocker" to "Nit". It only reports; it never changes your code. Adapted from [OneRedOak/claude-code-workflows](https://github.com/OneRedOak/claude-code-workflows) (MIT licence).
+- **1 plugin** (a ready-made add-on from Anthropic's official plugin store):
+  - **frontend-design**: Anthropic's own design skill that pushes Claude towards bold, distinctive designs instead of the average look. The installer adds it for you with `claude plugin install`.
 
 Nothing private is in the parts the Mac installer uses: no passwords, no login keys, no project notes. The `personal/` folder is my own Windows PC's configuration; the Mac installer never touches it.
 
@@ -85,6 +91,8 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 | Path | What it is | Installed on |
 |---|---|---|
 | `CLAUDE.md`, `skills/` | Shared rulebook and portable skills | Mac and Windows |
+| `agents/` | Shared subagents (design-review), copied to `~/.claude/agents/` | Mac and Windows |
+| `PLUGINS` in `scripts/setup_lib.py` and `install.sh` | Marketplace plugins the installers add with `claude plugin install` (frontend-design); keep both lists the same | Mac and Windows |
 | `personal/CLAUDE.personal.md` | My personal rules (explanation style, Windows shell, Brain vault, this workflow), appended to `CLAUDE.md` | Windows only |
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
 | `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, retro nudge) and their registration | Windows only |

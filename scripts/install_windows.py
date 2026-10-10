@@ -1,5 +1,5 @@
-"""Install this repo into ~/.claude on Windows: shared + personal parts, hooks, setup.json and the hooks block
-of settings.json. Everything it replaces is backed up first. Called by install.ps1.
+"""Install this repo into ~/.claude on Windows: shared + personal parts, subagents, marketplace plugins, hooks,
+setup.json and the hooks block of settings.json. Everything it replaces is backed up first. Called by install.ps1.
 
   py -3 scripts/install_windows.py [--dry-run] [--shared-only]
 
@@ -10,13 +10,14 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import (DEST, IGNORE, PERSONAL, compose_claude_md, drift, hook_sources,  # noqa: E402
-                       hooks_block, is_link, skill_sources)
+from setup_lib import (DEST, IGNORE, PERSONAL, PLUGINS, agent_sources, compose_claude_md, drift,  # noqa: E402
+                       hook_sources, hooks_block, installed_plugins, is_link, skill_sources)
 
 
 def main():
@@ -59,6 +60,32 @@ def main():
             if dst.exists():
                 shutil.rmtree(dst)
             shutil.copytree(src, dst, ignore=shutil.ignore_patterns(*IGNORE))
+
+    # 2b. Subagents
+    for ag in agent_sources():
+        dst = DEST / "agents" / ag.name
+        if dst.is_file() and dst.read_bytes().replace(b"\r\n", b"\n") == ag.read_bytes().replace(b"\r\n", b"\n"):
+            continue
+        save(dst)
+        actions.append(f"agents/{ag.name}")
+        if not a.dry_run:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ag, dst)
+
+    # 2c. Marketplace plugins (needs the `claude` CLI)
+    have = installed_plugins()
+    if have is None:
+        print("NOTE: `claude` CLI not found; install these plugins by hand: " +
+              ", ".join(f"claude plugin install {p}" for p in PLUGINS))
+    for p in PLUGINS:
+        if have is None or p in have:
+            continue
+        actions.append(f"plugin {p}")
+        if not a.dry_run:
+            r = subprocess.run([shutil.which("claude"), "plugin", "install", p], capture_output=True, text=True,
+                               encoding="utf-8")
+            if r.returncode != 0:
+                print(f"WARNING: plugin install failed for {p}: {(r.stderr or r.stdout).strip()}")
 
     if personal:
         # 3. Hooks
