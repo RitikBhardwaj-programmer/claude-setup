@@ -3,12 +3,16 @@ import filecmp
 import json
 import os
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 DEST = Path.home() / ".claude"
 PERSONAL = REPO / "personal"
 IGNORE = {"__pycache__", ".DS_Store"}
+# Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
+PLUGINS = ["frontend-design@claude-plugins-official"]
 
 
 def compose_claude_md(with_personal: bool) -> str:
@@ -38,6 +42,35 @@ def is_link(p: Path) -> bool:
         return p.is_symlink() or (p.exists() and os.path.realpath(p).lower() != os.path.abspath(p).lower())
     except OSError:
         return False
+
+
+def agent_sources():
+    """Subagent definitions (agents/*.md) the repo installs into ~/.claude/agents."""
+    d = REPO / "agents"
+    return sorted(d.glob("*.md")) if d.is_dir() else []
+
+
+def installed_plugins():
+    """Set of installed plugin ids (name@marketplace), or None when the `claude` CLI is not available."""
+    exe = shutil.which("claude")
+    if not exe:
+        return None
+    try:
+        out = subprocess.run([exe, "plugin", "list", "--json"], capture_output=True, text=True,
+                             encoding="utf-8", timeout=60).stdout
+        entries = json.loads(out or "[]")
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+    ids = set()
+    for e in entries:
+        if isinstance(e, str):
+            ids.add(e)
+        elif isinstance(e, dict):
+            if e.get("id"):
+                ids.add(e["id"])
+            if e.get("name") and e.get("marketplace"):
+                ids.add(f"{e['name']}@{e['marketplace']}")
+    return ids
 
 
 def hook_sources():
@@ -93,6 +126,17 @@ def drift(with_personal: bool):
                    if (DEST / "skills").is_dir() else set())
     for extra in sorted(live_skills - set(srcs) - {"synced"}):
         found.append(f"skills/{extra}: exists in ~/.claude but not in the repo")
+    for a in agent_sources():
+        live = DEST / "agents" / a.name
+        if not live.is_file() or live.read_bytes().replace(b"\r\n", b"\n") != a.read_bytes().replace(b"\r\n", b"\n"):
+            found.append(f"agents/{a.name}: missing or changed in ~/.claude")
+    have = installed_plugins()
+    if have is None:
+        found.append("plugins: cannot check (the `claude` CLI is not on PATH)")
+    else:
+        for p in PLUGINS:
+            if p not in have:
+                found.append(f"plugins: {p} is not installed")
     if with_personal:
         for h in hook_sources():
             live = DEST / "hooks" / h.name
