@@ -66,6 +66,9 @@ The approval of the card is the user's instruction to act on it. Do not ask agai
 - **Build in a new session:** use `start_session` with `initiation: "user_asked"`, `context: "fresh"`, the card's `model` and `effort`, and the approved plan as the brief (goal, files, steps, verification). That session can only use a model and effort the same as or cheaper than this one.
 - **This session's own model:** the session tools refuse to change it (a session must not re-price its own turns). If a phase needs a **stronger** model than the current one, tell the user in one line to pick it in the model menu (CLI: `/model`, `/effort`) before that phase.
 - **Codex:** after the user approves the handoff in the card, run `codex exec`.
+- **Every brief** (session, subagent or Codex) says how the worker checks its own work before it reports done, and contains: "If something you need is missing (a file, a secret, access, a tool), say exactly what and stop. Never mock, substitute or guess." A wrong brief otherwise fails quietly.
+- **Canary first:** when one brief feeds several sessions, subagents or Codex jobs, start one, check its result, fix the brief if needed, then start the rest.
+- **Verify after start:** after `start_session`, check the session's model and effort (`get_session`). If they differ from the card, fix it or tell the user before the work goes on.
 
 ## Step 6: Learn from the result
 
