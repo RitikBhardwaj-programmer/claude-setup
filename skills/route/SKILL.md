@@ -1,6 +1,6 @@
 ---
 name: route
-description: "Write a routing card (which model, effort and agent does each phase of the task) as part of the plan for any medium or large task, before implementation starts, so paid tokens go where they add value; also on /route or when the user asks 'which model/effort should we use', 'save tokens', 'is Opus needed for this', or 'should Codex do this part'. After the user approves the card, carry it out: start the build session or subagents at the chosen model and effort, and offer Codex handoffs. Skip for small tasks (typo, rename, one-file fix, a quick question)."
+description: "Write a routing card (which model, effort and agent does each phase of the task) for any medium or large task before implementation starts, so paid tokens go where they add value. Use it as part of the plan, AND also when there is no plan step: at the start of any medium or large build ('build X', 'make me a report/app/processor'), and the moment a task that began small grows into medium work (more files, debugging rounds, a redesign). Also on /route or when the user asks 'which model/effort should we use', 'save tokens', 'is Opus needed for this', or 'should Codex do this part'. After the user approves the card, carry it out: start the build session or subagents at the chosen model and effort, and offer Codex handoffs. Skip for small tasks (typo, rename, one-file fix, a quick question)."
 ---
 
 # Route
