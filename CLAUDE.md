@@ -27,6 +27,8 @@ Pick the lightest process that is safe. Escalate if a task turns out bigger than
 | Medium | new endpoint, change a service, add a feature to a module | Explore → plan → implement → test → review → summarize |
 | Large | new subsystem, schema redesign, new integration, cross-cutting refactor | Spec → explore → detailed plan → approval → implement in stages (test each) → full review → docs → summarize |
 
+Every medium or large task gets a routing card (`route` skill) before implementation, even when no formal plan is written. If a small task grows into a medium one, write the card at that point.
+
 ## Before Making Changes
 - Run `git status` and note the current branch and any uncommitted work.
 - Read the files you will change, plus their direct callers and dependencies.
