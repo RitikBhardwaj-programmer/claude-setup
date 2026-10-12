@@ -12,7 +12,7 @@ DEST = Path.home() / ".claude"
 PERSONAL = REPO / "personal"
 IGNORE = {"__pycache__", ".DS_Store"}
 # Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
-PLUGINS = ["frontend-design@claude-plugins-official"]
+PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official"]
 
 
 def compose_claude_md(with_personal: bool) -> str:
