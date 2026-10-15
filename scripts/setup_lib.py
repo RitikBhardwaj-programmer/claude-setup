@@ -19,6 +19,8 @@ CODEX_AGENTS = HOME / ".codex" / "AGENTS.md"
 GEMINI_CONFIG = HOME / ".gemini" / "config"
 GEMINI_SKILLS_JSON = GEMINI_CONFIG / "skills.json"
 GEMINI_MCP_JSON = GEMINI_CONFIG / "mcp_config.json"
+# Antigravity runs this sidecar itself (the user enables it in its Automations dashboard; the installer never does).
+GEMINI_SIDECAR_JSON = GEMINI_CONFIG / "sidecars" / "handoff-watcher" / "sidecar.json"
 # Skills with no Claude-only tool calls (checked by grep), so Antigravity can load them from ~/.claude/skills.
 PORTABLE_SKILLS = ["agent-handoff", "context-handoff", "explain", "intuition", "youtube-transcript"]
 RULES_BLOCK_FILE = REPO / "shared" / "agent-bridge-rules.md"
@@ -212,6 +214,27 @@ def want_mcp_json(have: dict):
     return out
 
 
+def want_sidecar_json(have: dict) -> dict:
+    """Handoff-watcher sidecar.json with our launch keys set. Other keys (agent_permissions that Antigravity or the
+    user adds after a test run) are kept."""
+    script = DEST / "skills" / "agent-handoff" / "scripts" / "antigravity_watcher.py"
+    out = dict(have)
+    out.update({
+        "command": (shutil.which("py") or "py").replace("\\", "/"),
+        "args": ["-3", str(script).replace("\\", "/")],
+        "restart_policy": "always",
+        "display_name": "Agent handoff watcher",
+        "description": "Starts an Antigravity conversation when a project on the watch list gets an open "
+                       ".handoff/ brief addressed to Antigravity (agent-handoff skill).",
+    })
+    return out
+
+
+# Files outside ~/.claude that the bridge manages: (path, function giving the wanted JSON from the current JSON).
+BRIDGE_JSON = ((GEMINI_SKILLS_JSON, want_skills_json), (GEMINI_MCP_JSON, want_mcp_json),
+               (GEMINI_SIDECAR_JSON, want_sidecar_json))
+
+
 def bridge_drift():
     """Drift findings for the agent-bridge files outside ~/.claude."""
     found = []
@@ -220,13 +243,14 @@ def bridge_drift():
         if merge_block(have) != have:
             found.append("~/.codex/AGENTS.md: agent-bridge block missing or changed")
     if GEMINI_CONFIG.is_dir():
-        for path, want_fn in ((GEMINI_SKILLS_JSON, want_skills_json), (GEMINI_MCP_JSON, want_mcp_json)):
+        for path, want_fn in BRIDGE_JSON:
+            name = path.relative_to(GEMINI_CONFIG).as_posix()
             try:
                 have = read_json_file(path)
             except ValueError:
-                found.append(f"~/.gemini/config/{path.name}: invalid JSON")
+                found.append(f"~/.gemini/config/{name}: invalid JSON")
                 continue
             want = want_fn(have)
             if want is not None and want != have:
-                found.append(f"~/.gemini/config/{path.name}: our entry is missing or changed")
+                found.append(f"~/.gemini/config/{name}: our entry is missing or changed")
     return found

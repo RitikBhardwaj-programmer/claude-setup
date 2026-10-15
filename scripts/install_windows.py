@@ -17,10 +17,9 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import (CODEX_AGENTS, DEST, GEMINI_CONFIG, GEMINI_MCP_JSON, GEMINI_SKILLS_JSON, HOME, IGNORE,  # noqa: E402
-                       PERSONAL, PLUGINS, agent_sources, compose_claude_md, drift, hook_sources, hooks_block,
-                       installed_plugins, is_link, merge_block, read_json_file, skill_sources, want_mcp_json,
-                       want_skills_json)
+from setup_lib import (BRIDGE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG, HOME, IGNORE, PERSONAL,  # noqa: E402
+                       PLUGINS, agent_sources, compose_claude_md, drift, hook_sources, hooks_block, installed_plugins,
+                       is_link, merge_block, read_json_file, skill_sources)
 
 
 def main():
@@ -139,7 +138,7 @@ def main():
         else:
             print("NOTE: ~/.codex not found; skipped the Codex rules block.")
         if GEMINI_CONFIG.is_dir():
-            for path, want_fn in ((GEMINI_SKILLS_JSON, want_skills_json), (GEMINI_MCP_JSON, want_mcp_json)):
+            for path, want_fn in BRIDGE_JSON:
                 try:
                     have = read_json_file(path)
                 except ValueError:
@@ -148,11 +147,12 @@ def main():
                 want = want_fn(have)
                 if want is not None and want != have:
                     save(path)
-                    actions.append(f"~/.gemini/config/{path.name}")
+                    actions.append(f"~/.gemini/config/{path.relative_to(GEMINI_CONFIG).as_posix()}")
                     if not a.dry_run:
+                        path.parent.mkdir(parents=True, exist_ok=True)
                         path.write_text(json.dumps(want, indent=2) + "\n", encoding="utf-8")
         else:
-            print("NOTE: ~/.gemini/config not found; skipped Antigravity skills.json and MCP config.")
+            print("NOTE: ~/.gemini/config not found; skipped Antigravity skills.json, MCP config and watcher sidecar.")
 
     print(("DRY RUN - would install: " if a.dry_run else "Installed: ") + ", ".join(actions))
     if backed and not a.dry_run:
