@@ -13,6 +13,16 @@ PERSONAL = REPO / "personal"
 IGNORE = {"__pycache__", ".DS_Store"}
 # Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
 PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official"]
+# Agent bridge: other apps that read the shared skills and rules. Each target is only touched when its app folder exists.
+HOME = Path.home()
+CODEX_AGENTS = HOME / ".codex" / "AGENTS.md"
+GEMINI_CONFIG = HOME / ".gemini" / "config"
+GEMINI_SKILLS_JSON = GEMINI_CONFIG / "skills.json"
+GEMINI_MCP_JSON = GEMINI_CONFIG / "mcp_config.json"
+# Skills with no Claude-only tool calls (checked by grep), so Antigravity can load them from ~/.claude/skills.
+PORTABLE_SKILLS = ["agent-handoff", "context-handoff", "explain", "intuition", "youtube-transcript"]
+RULES_BLOCK_FILE = REPO / "shared" / "agent-bridge-rules.md"
+BLOCK_START, BLOCK_END = "<!-- agent-bridge:start -->", "<!-- agent-bridge:end -->"
 
 
 def compose_claude_md(with_personal: bool) -> str:
@@ -154,4 +164,69 @@ def drift(with_personal: bool):
         if sj.is_file() and (not live_sj.is_file() or
                              json.loads(sj.read_text(encoding="utf-8")) != json.loads(live_sj.read_text(encoding="utf-8"))):
             found.append("setup.json: missing or different in ~/.claude")
+        found += bridge_drift()
+    return found
+
+
+# ---- Agent bridge (Codex rules, Antigravity skills.json and MCP) ----
+
+def rules_block() -> str:
+    body = RULES_BLOCK_FILE.read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+    return f"{BLOCK_START}\n{body}\n{BLOCK_END}"
+
+
+def merge_block(text: str) -> str:
+    """text (LF newlines) with the agent-bridge block added or replaced; nothing outside the markers changes."""
+    block = rules_block()
+    i, j = text.find(BLOCK_START), text.find(BLOCK_END)
+    if i != -1 and j > i:
+        return text[:i] + block + text[j + len(BLOCK_END):]
+    return (text.rstrip("\n") + "\n\n" if text.strip() else "") + block + "\n"
+
+
+def read_json_file(path: Path):
+    """Parsed JSON object of a file; {} when missing or empty. Raises ValueError on invalid JSON."""
+    if not path.is_file() or not path.read_text(encoding="utf-8").strip():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def want_skills_json(have: dict) -> dict:
+    """skills.json with our ~/.claude/skills entry set, keeping every other key and entry."""
+    out = dict(have)
+    entries = [e for e in out.get("entries", []) if e.get("path") != "~/.claude/skills"]
+    entries.append({"path": "~/.claude/skills", "include_only": list(PORTABLE_SKILLS)})
+    out["entries"] = entries
+    return out
+
+
+def want_mcp_json(have: dict):
+    """mcp_config.json with the basic-memory server set (from personal/setup.json), or None when not configured."""
+    sj = PERSONAL / "setup.json"
+    cfg = json.loads(sj.read_text(encoding="utf-8")).get("basic_memory_mcp") if sj.is_file() else None
+    if not cfg:
+        return None
+    out = dict(have)
+    out["mcpServers"] = {**out.get("mcpServers", {}),
+                         "basic-memory": {"command": cfg["command"], "args": cfg.get("args", [])}}
+    return out
+
+
+def bridge_drift():
+    """Drift findings for the agent-bridge files outside ~/.claude."""
+    found = []
+    if CODEX_AGENTS.parent.is_dir():
+        have = CODEX_AGENTS.read_text(encoding="utf-8").replace("\r\n", "\n") if CODEX_AGENTS.is_file() else ""
+        if merge_block(have) != have:
+            found.append("~/.codex/AGENTS.md: agent-bridge block missing or changed")
+    if GEMINI_CONFIG.is_dir():
+        for path, want_fn in ((GEMINI_SKILLS_JSON, want_skills_json), (GEMINI_MCP_JSON, want_mcp_json)):
+            try:
+                have = read_json_file(path)
+            except ValueError:
+                found.append(f"~/.gemini/config/{path.name}: invalid JSON")
+                continue
+            want = want_fn(have)
+            if want is not None and want != have:
+                found.append(f"~/.gemini/config/{path.name}: our entry is missing or changed")
     return found

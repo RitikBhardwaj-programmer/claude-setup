@@ -1,5 +1,6 @@
 """Install this repo into ~/.claude on Windows: shared + personal parts, subagents, marketplace plugins, hooks,
-setup.json and the hooks block of settings.json. Everything it replaces is backed up first. Called by install.ps1.
+setup.json, the hooks block of settings.json and the agent bridge (Codex rules block, Antigravity skills.json and
+basic-memory MCP entry). Everything it replaces is backed up first. Called by install.ps1.
 
   py -3 scripts/install_windows.py [--dry-run] [--shared-only]
 
@@ -16,8 +17,10 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import (DEST, IGNORE, PERSONAL, PLUGINS, agent_sources, compose_claude_md, drift,  # noqa: E402
-                       hook_sources, hooks_block, installed_plugins, is_link, skill_sources)
+from setup_lib import (CODEX_AGENTS, DEST, GEMINI_CONFIG, GEMINI_MCP_JSON, GEMINI_SKILLS_JSON, HOME, IGNORE,  # noqa: E402
+                       PERSONAL, PLUGINS, agent_sources, compose_claude_md, drift, hook_sources, hooks_block,
+                       installed_plugins, is_link, merge_block, read_json_file, skill_sources, want_mcp_json,
+                       want_skills_json)
 
 
 def main():
@@ -32,11 +35,13 @@ def main():
 
     def save(path: Path):
         if path.exists():
-            target = backup / path.relative_to(DEST)
+            # Files under ~/.claude keep their relative path; others (Codex, Antigravity) go under home/.
+            inside = path.is_relative_to(DEST)
+            target = backup / (path.relative_to(DEST) if inside else Path("home") / path.relative_to(HOME))
             if not a.dry_run:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 (shutil.copytree if path.is_dir() else shutil.copy2)(path, target)
-            backed.append(str(path.relative_to(DEST)))
+            backed.append(str(path.relative_to(DEST)) if inside else str(path))
 
     # 1. CLAUDE.md
     md = compose_claude_md(personal)
@@ -119,6 +124,35 @@ def main():
                     for p in [x for x in hk.get("command", "").split('"') if x.lower().endswith(".py")]:
                         if not Path(p).is_file():
                             print(f"WARNING: {event} hook script not found: {p}")
+
+        # 6. Agent bridge: rules block for Codex; shared skills and basic-memory MCP for Antigravity.
+        # Antigravity documents no global rules file, so it gets the rules per project (AGENTS.md); see README.
+        if CODEX_AGENTS.parent.is_dir():
+            raw = CODEX_AGENTS.read_text(encoding="utf-8") if CODEX_AGENTS.is_file() else ""
+            have = raw.replace("\r\n", "\n")
+            new = merge_block(have)
+            if new != have:
+                save(CODEX_AGENTS)
+                actions.append("~/.codex/AGENTS.md (agent-bridge block)")
+                if not a.dry_run:
+                    CODEX_AGENTS.write_text(new, encoding="utf-8", newline="\r\n" if "\r\n" in raw else "\n")
+        else:
+            print("NOTE: ~/.codex not found; skipped the Codex rules block.")
+        if GEMINI_CONFIG.is_dir():
+            for path, want_fn in ((GEMINI_SKILLS_JSON, want_skills_json), (GEMINI_MCP_JSON, want_mcp_json)):
+                try:
+                    have = read_json_file(path)
+                except ValueError:
+                    print(f"WARNING: {path} is not valid JSON; left alone. Fix it, then run the installer again.")
+                    continue
+                want = want_fn(have)
+                if want is not None and want != have:
+                    save(path)
+                    actions.append(f"~/.gemini/config/{path.name}")
+                    if not a.dry_run:
+                        path.write_text(json.dumps(want, indent=2) + "\n", encoding="utf-8")
+        else:
+            print("NOTE: ~/.gemini/config not found; skipped Antigravity skills.json and MCP config.")
 
     print(("DRY RUN - would install: " if a.dry_run else "Installed: ") + ", ".join(actions))
     if backed and not a.dry_run:
