@@ -44,6 +44,17 @@ The handoff command (non-interactive): `codex exec -s <read-only|workspace-write
 
 Windows: if every Codex shell call fails with `helper_unknown_error: setup refresh had errors`, the config has `[windows] sandbox = "elevated"` (set up by the Codex desktop app; the CLI cannot refresh it). Add `-c 'windows.sandbox="unelevated"'` to the command. Do not edit the user's `config.toml`. Expect ~15k ChatGPT-quota tokens of overhead per call, so one larger handoff beats many small ones.
 
+## Step 3b: Antigravity handoff (manual)
+
+Antigravity (Google AI Pro quota) is a second lane next to Codex. Claude never starts it: Claude writes a brief, and Antigravity's own watcher sidecar starts the work (or the user pastes a line when the watcher is off). Offer a phase to Antigravity when it is one of these:
+- UI or browser-agent testing (Antigravity's browser agent can click through the app and check it).
+- A large build phase that would burn Claude quota, with a brief that stands alone.
+- A second-opinion review on Gemini or Opus 5.5, inside the Google quota.
+
+The same four conditions as for Codex apply (self-contained, cheap to check, large compared with the brief, no other writer on those files).
+
+Carrying it out: run the `agent-handoff` skill in mode `out` with `to: antigravity`, and deliver and wait for the return as that skill says (watcher on: nothing to paste; a background `handoff.py wait` wakes Claude when the return arrives). **Never shell out to `agy`, and never start Antigravity from another agent.** Google's FAQ says wrapping `agy` inside third-party agents is not supported on consumer plans (https://antigravity.google/docs/faq), and accounts were suspended for it.
+
 Do not route anything through free third-party gateways (for example OmniRoute). The user parked that option on 2026-10-08 (security and data concerns).
 
 ## Step 4: Write the card into the plan
@@ -54,6 +65,7 @@ Do not route anything through free third-party gateways (for example OmniRoute).
 |---|---|---|---|---|
 | ... | ... | ... | ... | one short reason |
 Codex handoffs: <phase, or "none">
+Antigravity handoffs: <phase, or "none">
 Switch needed: <"none" | "build in a new session at sonnet/medium" | "user: pick opus in the model menu">
 ```
 
@@ -66,7 +78,8 @@ The approval of the card is the user's instruction to act on it. Do not ask agai
 - **Build in a new session:** use `start_session` with `initiation: "user_asked"`, `context: "fresh"`, the card's `model` and `effort`, and the approved plan as the brief (goal, files, steps, verification). That session can only use a model and effort the same as or cheaper than this one.
 - **This session's own model:** the session tools refuse to change it (a session must not re-price its own turns). If a phase needs a **stronger** model than the current one, tell the user in one line to pick it in the model menu (CLI: `/model`, `/effort`) before that phase.
 - **Codex:** after the user approves the handoff in the card, run `codex exec`.
-- **Every brief** (session, subagent or Codex) says how the worker checks its own work before it reports done, and contains: "If something you need is missing (a file, a secret, access, a tool), say exactly what and stop. Never mock, substitute or guess." A wrong brief otherwise fails quietly.
+- **Antigravity:** after the user approves the handoff in the card, run `agent-handoff` in mode `out` (watcher or paste line, then a background wait for the return). Do not run `agy`.
+- **Every brief** (session, subagent, Codex or Antigravity) says how the worker checks its own work before it reports done, and contains: "If something you need is missing (a file, a secret, access, a tool), say exactly what and stop. Never mock, substitute or guess." A wrong brief otherwise fails quietly.
 - **Canary first:** when one brief feeds several sessions, subagents or Codex jobs, start one, check its result, fix the brief if needed, then start the rest.
 - **Verify after start:** after `start_session`, check the session's model and effort (`get_session`). If they differ from the card, fix it or tell the user before the work goes on.
 

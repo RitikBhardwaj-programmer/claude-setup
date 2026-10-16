@@ -7,5 +7,13 @@
   "setup_repo": "C:/Users/DELL/claude-setup",
   "setup_install": "powershell -ExecutionPolicy Bypass -File C:/Users/DELL/claude-setup/install.ps1",
   "setup_check": "py -3 C:/Users/DELL/claude-setup/scripts/check_drift.py",
-  "commit_trailer": "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+  "commit_trailer": "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "basic_memory_mcp": {
+    "command": "C:/Users/DELL/.local/bin/basic-memory.exe",
+    "args": [
+      "mcp",
+      "--project",
+      "brain"
+    ]
+  }
 }
