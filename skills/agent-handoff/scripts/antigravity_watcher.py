@@ -103,6 +103,17 @@ def scan(failed: dict, warned: set):
                 log(f"FAILED rc={r.returncode} {brief} :: {(r.stderr or r.stdout).strip()[:300]}")
 
 
+def code_mtimes() -> tuple:
+    here = Path(__file__).resolve().parent
+    out = []
+    for name in ("antigravity_watcher.py", "handoff.py"):
+        try:
+            out.append((here / name).stat().st_mtime)
+        except OSError:
+            out.append(None)
+    return tuple(out)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--once", action="store_true", help="scan once and exit (for tests)")
@@ -110,7 +121,13 @@ def main() -> int:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     log("watcher start")
     failed, warned = {}, set()
+    started = code_mtimes()
     while True:
+        if code_mtimes() != started:
+            # An installer update changed our code. Exit; Antigravity restarts us (restart_policy "always")
+            # with the new code, so fixes never sit unused in an old process.
+            log("code changed; exiting so Antigravity restarts the watcher")
+            return 0
         HEARTBEAT.touch()
         try:
             scan(failed, warned)
