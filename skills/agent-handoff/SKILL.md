@@ -50,7 +50,7 @@ Body: use the `context-handoff` sections that matter (objective, done / in progr
 - `## If something is missing` : "Say exactly what and stop. Never mock, substitute or guess."
 - `## Honesty` : "Report failures and unverified parts as they are."
 
-`LOCK` is two lines: `agent: <name>` and `brief: <brief file name>`, plus `since: <timestamp>` as a third line.
+`LOCK` is two lines: `agent: <name>` and `brief: <brief file name>`, plus `since: <timestamp>` as a third line. An empty `LOCK` file means no lock.
 
 ## Helper script and the Antigravity watcher
 
@@ -65,6 +65,7 @@ Body: use the `context-handoff` sections that matter (objective, done / in progr
 - No other agent starts Antigravity; they only write the file. This is why it stays inside Google's terms.
 - It ignores briefs that git tracks, so a cloned repo cannot start an agent.
 - It waits while another agent holds `LOCK`.
+- Its runs are unattended, so Antigravity auto-denies commands that are not pre-approved (2026-10-16 test: `python test_calc.py` was denied, and the agent reported Verify as skipped). Approve the usual verify commands once in Antigravity's permission settings, or the sender runs `## Verify` itself on `in`.
 
 ## First use in a project
 
@@ -106,7 +107,7 @@ Run the agent-handoff skill in mode in. Brief: .handoff/<file>.md
    - Open issues, assumptions and anything unverified.
    - What the sender should do next.
 2. Set `status: done` (or `blocked`) in the brief's frontmatter.
-3. Delete `.handoff/LOCK` if it names me.
+3. Release `.handoff/LOCK` if it names me: delete it, or, if your tools cannot delete files, overwrite it with an empty file. An empty `LOCK` counts as no lock.
 4. Do not commit unless the brief or the user says to. The sender may already be waiting for this file (mode `out` step 6), and then nothing else is needed. In case it is not, run `handoff.py copy "<line>"` and print the paste line for the user to give the sender:
 
 ```

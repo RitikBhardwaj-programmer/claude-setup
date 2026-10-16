@@ -53,7 +53,7 @@ def lock_holder(project: Path):
     for line in lock.read_text(encoding="utf-8", errors="replace").splitlines():
         if line.lower().startswith("agent:"):
             return line.split(":", 1)[1].strip().lower()
-    return "unknown"
+    return None  # empty LOCK = released (agents that cannot delete files empty it instead)
 
 
 def prompt_for(project: Path, brief: Path) -> str:
