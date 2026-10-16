@@ -6,8 +6,15 @@
   python handoff.py wait <return file> [--timeout SECONDS]
                                               blocks until the return file exists, then prints its path (exit 0);
                                               exit 2 on timeout. Run it as a background task so the agent wakes up.
+  python handoff.py log-outcome --brief <brief file> --result pass|partial|redo --verify-ran yes|no
+                    --handoff-turns N --self-turns N [--redo-turns N] [--note TEXT]
+                                              appends one JSON line to <project>/.handoff/outcomes.jsonl (once per brief)
+  python handoff.py outcomes [project dir ...]
+                                              summary per worker agent: count, results, turns saved. Defaults to the
+                                              watch list plus the current folder.
 """
 import argparse
+import json
 import os
 import re
 import shutil
@@ -99,6 +106,74 @@ def wait(path: Path, timeout: int) -> int:
     return 2
 
 
+def log_outcome(brief: Path, result: str, verify_ran: bool, handoff_turns: int, self_turns: int,
+                redo_turns: int, note: str) -> int:
+    """Append one outcome line for a finished brief. saved_turns = self - handoff - redo (negative = handoff cost more)."""
+    fm = frontmatter(brief)
+    if not fm:
+        print(f"Not a brief (no frontmatter): {brief}")
+        return 1
+    log = brief.parent / "outcomes.jsonl"
+    for row in read_outcomes(log):
+        if row.get("brief") == brief.name:
+            print(f"Already logged: {brief.name}")
+            return 1
+    row = {
+        "date": time.strftime("%Y-%m-%d"),
+        "brief": brief.name,
+        "from": fm.get("from", ""),
+        "to": fm.get("to", ""),
+        "result": result,
+        "verify_ran": verify_ran,
+        "handoff_turns": handoff_turns,
+        "self_turns": self_turns,
+        "redo_turns": redo_turns,
+        "saved_turns": self_turns - handoff_turns - redo_turns,
+        "note": note,
+    }
+    with log.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    print(f"Logged: {brief.name} -> {row['to']}, {result}, saved {row['saved_turns']} turns")
+    return 0
+
+
+def read_outcomes(log: Path) -> list:
+    rows = []
+    if log.is_file():
+        for line in log.read_text(encoding="utf-8").splitlines():
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                continue  # skip a damaged line rather than fail the whole summary
+    return rows
+
+
+def outcomes(dirs: list) -> int:
+    seen, rows = set(), []
+    for d in dirs:
+        key = os.path.normcase(str(Path(d).resolve()))
+        if key in seen:
+            continue
+        seen.add(key)
+        rows += read_outcomes(Path(d) / ".handoff" / "outcomes.jsonl")
+    if not rows:
+        print("No outcomes logged yet.")
+        return 0
+    by = {}
+    for r in rows:
+        by.setdefault(r.get("to") or "?", []).append(r)
+    print(f"{'worker':<12} {'n':>3} {'pass':>5} {'partial':>8} {'redo':>5} {'verify ran':>11} {'saved':>6} {'avg':>6}")
+    for to, rs in sorted(by.items()) + [("ALL", rows)]:
+        n = len(rs)
+        count = {k: sum(1 for r in rs if r.get("result") == k) for k in ("pass", "partial", "redo")}
+        ran = sum(1 for r in rs if r.get("verify_ran"))
+        saved = sum(int(r.get("saved_turns", 0)) for r in rs)
+        print(f"{to:<12} {n:>3} {count['pass']:>5} {count['partial']:>8} {count['redo']:>5} {ran:>5}/{n:<5} "
+              f"{saved:>6} {saved / n:>6.1f}")
+    print("saved = Claude turns it would have taken itself - handoff turns - redo turns (estimates; negative = a loss)")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -110,7 +185,26 @@ def main() -> int:
     p = sub.add_parser("wait")
     p.add_argument("file")
     p.add_argument("--timeout", type=int, default=3600)
+    p = sub.add_parser("log-outcome")
+    p.add_argument("--brief", required=True)
+    p.add_argument("--result", required=True, choices=["pass", "partial", "redo"])
+    p.add_argument("--verify-ran", required=True, choices=["yes", "no"])
+    p.add_argument("--handoff-turns", required=True, type=int)
+    p.add_argument("--self-turns", required=True, type=int)
+    p.add_argument("--redo-turns", type=int, default=0)
+    p.add_argument("--note", default="")
+    p = sub.add_parser("outcomes")
+    p.add_argument("dirs", nargs="*")
     a = ap.parse_args()
+
+    if a.cmd == "log-outcome":
+        if min(a.handoff_turns, a.self_turns, a.redo_turns) < 0:
+            print("Turn counts must be 0 or more.")
+            return 1
+        return log_outcome(Path(a.brief), a.result, a.verify_ran == "yes", a.handoff_turns, a.self_turns,
+                           a.redo_turns, a.note)
+    if a.cmd == "outcomes":
+        return outcomes(a.dirs or watch_dirs() + [os.getcwd()])
 
     if a.cmd == "watcher-status":
         print("on" if watcher_on() else "off")
