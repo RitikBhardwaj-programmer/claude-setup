@@ -19,6 +19,8 @@ Every step below is plain "read a file, run git, write a file". Use whatever fil
 - **Missing means stop.** If something you need is missing (a file, a secret, access, a tool, a brief), say exactly what and stop. Never mock, substitute or guess.
 - **Honesty.** Report failures, skipped steps and unverified claims as they are. Never show only the passing results. Mark each claim VERIFIED, ASSUMPTION or UNVERIFIED.
 - **No secrets** in a brief or a return. Env var names only.
+- **One command per call.** Run each shell command on its own; never chain them with `;`, `&&` or `|`. Chained commands get stricter permission review (Antigravity flags them), and one denial then hides which step failed.
+- **Denied means skipped, not passed.** If the app denies a command (permission, sandbox, no approval in an unattended run), do not retry it another way or work around it. Mark that step UNVERIFIED in the return, say which command was denied, and let the sender run it.
 - **Never wrap another vendor's agent or reuse its login.** Do not run `agy`, `claude` or `codex` from inside a different agent to do the other one's work, and do not copy tokens between apps. The one exception is the user's own existing Codex lane: `codex exec` run from Claude Code through the `route` skill. Everything else goes through the user.
 
 ## Files
