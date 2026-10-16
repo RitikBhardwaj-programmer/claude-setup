@@ -1,0 +1,11 @@
+{"_note": "Hand-written from Adzuna's documented response shape (no API keys were available to capture a live sample).",
+ "count": 2, "mean": 300000,
+ "results": [
+  {"id": "4000000001", "title": "Software Engineer Intern", "company": {"display_name": "Example Tech Pvt Ltd"},
+   "location": {"display_name": "Bengaluru, Karnataka", "area": ["India", "Karnataka", "Bengaluru"]},
+   "description": "Work on backend services in Python. Stipend based...", "redirect_url": "https://www.adzuna.in/land/ad/4000000001",
+   "created": "2026-10-10T08:00:00Z", "salary_min": 240000, "salary_max": 360000, "salary_is_predicted": "1"},
+  {"id": "4000000002", "title": "ML Intern (Remote)", "company": {"display_name": "Sample AI"},
+   "location": {"display_name": "India"}, "description": "Train models.", "redirect_url": "https://www.adzuna.in/land/ad/4000000002",
+   "created": "2026-10-11T08:00:00Z"}
+ ]}
