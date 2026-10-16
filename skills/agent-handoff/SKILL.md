@@ -118,6 +118,21 @@ Run the agent-handoff skill in mode in. Return: .handoff/<file>-return.md
 
 The sender, on `in`, reads a return file addressed to it the same way as a brief: check it against git before trusting it, then set the return file's `status: done` so the SessionStart reminder stops. (A return file is `open` until its receiver has read it. It does not take the lock.)
 
+**Log the outcome** (sender only, once per brief, after you have checked the return and run its `## Verify` yourself if the worker could not). This measures whether handing off really saves the sender's turns:
+
+```
+handoff.py log-outcome --brief .handoff/<brief>.md --result pass|partial|redo --verify-ran yes|no --handoff-turns N --self-turns N [--redo-turns N] [--note "<one line>"]
+```
+
+- `result`: `pass` = usable as returned; `partial` = you fixed part of it; `redo` = you did it yourself.
+- `verify-ran`: did the *worker* run the Verify commands itself?
+- `handoff-turns`: your turns spent on this handoff (writing the brief, reading the return, verifying).
+- `self-turns`: your honest estimate of the turns doing the task yourself would have taken.
+- `redo-turns`: turns spent fixing or redoing it.
+- Turn counts are estimates. Do not round them in the handoff's favour.
+
+`handoff.py outcomes` prints the summary per worker. A worker whose average "saved" is near zero or negative is not worth handing work to for that kind of task.
+
 ## Before finishing, check
 
 - Is the lock state right (held by me during work, gone after `return`)?
