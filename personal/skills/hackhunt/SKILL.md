@@ -1,6 +1,6 @@
 ---
 name: hackhunt
-description: Find, rank and track hackathons for the user (India, online and offline) with eligibility and deadlines first. Modes - scan (Devpost and MLH scripts, Unstop and Devfolio read in the browser, curated corporate challenges), shortlist (rank with the exact team/eligibility sentence quoted), track <id> (after a yes, add reg/submit deadlines to Notion Calendar), status (due this week, counts per stage). Use on /hackhunt, "find me hackathons", "what hackathons are open", "any deadlines this week", "scan Unstop/Devfolio". Never registers, submits, pays or logs in for the user.
+description: Find, rank and track hackathons for the user (India, online and offline) with eligibility and deadlines first. Modes - scan (Devpost and MLH scripts, Unstop and Devfolio read in the browser, curated corporate challenges), shortlist (rank with the exact team/eligibility sentence quoted), track <id> (after a yes, add reg/submit deadlines as To-Do pages that show in Notion Calendar), status (due this week, counts per stage). Use on /hackhunt, "find me hackathons", "what hackathons are open", "any deadlines this week", "scan Unstop/Devfolio". Never registers, submits, pays or logs in for the user.
 ---
 
 # hackhunt
@@ -14,7 +14,7 @@ Why: good hackathons are lost to rules found late (Innovathon 2.0 was dropped be
 4. **Eligibility is the point.** Every shortlist row quotes the exact team/eligibility sentence you used, with its source. If team size or eligibility is not stated, write `CHECK: team size not stated` (never a guess, never "probably solo").
 5. **Scam / low-trust flags:** a fee to "guarantee" selection or a prize, no organiser identity, contact only by WhatsApp/Telegram, prize claims with no sponsor. Show a ⚠ with the reason. A normal entry fee only lowers the score.
 6. **No secrets in files or chat.** Private data (prefs, challenges, hacks.db, tracker.csv) stays in the data folder, never in claude-setup or GitHub.
-7. **Notion Calendar writes are persistent:** ask before each `track`. A yes covers that hackathon only.
+7. **Notion writes are persistent:** ask before each `track`. A yes covers that hackathon only.
 8. Report failures honestly (a fetcher errored, a site was skipped). Do not fill gaps with made-up hackathons or dates.
 
 ## Setup
@@ -34,7 +34,7 @@ PY SK/scripts/hacks_db.py score ID 82 "one-line reason"
 PY SK/scripts/hacks_db.py status ID shortlisted [--note "..."]
 PY SK/scripts/hacks_db.py elig ID "exact team/eligibility sentence"   # replace the stored quote
 PY SK/scripts/hacks_db.py due [--days 7]           # reg/submit deadlines in the next N days
-PY SK/scripts/hacks_db.py notion ID --reg EVID --submit EVID   # remember Notion Calendar event ids
+PY SK/scripts/hacks_db.py notion ID --reg EVID --submit EVID   # remember Notion page ids
 PY SK/scripts/hacks_db.py export                   # DATA/tracker.csv
 ```
 Statuses: `new → shortlisted → registered → submitted → advanced / won / out`; `skipped` only from `new`/`shortlisted`. The tool refuses illegal moves (e.g. new → registered): that error is correct, tell the user. Only the user can say they registered or submitted.
@@ -65,12 +65,22 @@ Goal: a short ranked list the user can disagree with.
 5. Show a table of the top 15: `id | score | name | organiser | mode/city | team rule | fee | deadline (reg / submit) | ⚠ | quoted eligibility sentence + source | link`. The quoted sentence is mandatory (rule 4). Ask: "Shortlist which? (ids, or 'top 5')". Set chosen ones to `shortlisted`; never shortlist without the user's pick, except when they said "top N". Then `export`.
 
 ## Mode: track <id>
-Goal: deadlines on the user's Notion Calendar. Persistent write, so ask once (rule 7).
+Goal: deadlines that show in the user's Notion Calendar. Persistent write, so ask once (rule 7).
 
-1. `hacks_db.py show ID`. Needs status `shortlisted` or `registered` and at least one real deadline. If no date is known, say so and stop.
-2. Ask: "Add 'Register: <name>' on <reg_deadline> and 'Submit: <name>' on <submit_deadline> to your Notion Calendar, with reminders 3 days and 1 day before?" Wait for a clear yes.
-3. On yes, call `notion-calendar-create-events` (load the schema with ToolSearch first; list calendars with `notion-calendar-list-calendars` if the calendar id is needed). All-day events, the URL in the description, reminders 3 days and 1 day before. Save the returned event ids: `hacks_db.py notion ID --reg ... --submit ...`.
-4. Do not move the hackathon to `registered` yourself. Tell the user to register on the site, then say so; then `status ID registered --note "team: ..."`.
+Do **not** call `notion-calendar-create-events`. This Notion connection does not expose calendar write tools: `notion-get-tool-access` lists only the calendar read tools, and the create call returns a 403 `restricted_resource` error. Use To-Do Database pages with a Due date instead; Notion Calendar shows them.
+
+1. `hacks_db.py show ID`. Needs status `shortlisted` or `registered` and at least one real deadline. If no date is known, say so and stop. Take dates from the event page, not from memory. On Unstop, stage and deadline dates render only after their tabs ("Stages & Timeline", "Dates & Deadlines") are clicked, and the registration deadline is not the event date (rule 3 page limits still apply).
+2. Ask: "Add these to your Notion To-Do Database (they show in Notion Calendar): <list each deadline/event with date and time>, plus all-day reminders 3 days and 1 day before?" Wait for a clear yes.
+3. On yes, load the `notion-create-pages` schema with ToolSearch, then create the pages in data source `5333c88f-5f08-8238-9dc4-07b0bf30355a` ("✅ To-Do Database"). One page per real deadline or event (for example registration deadline, submission deadline, event day), plus two all-day reminder pages per deadline, 3 days and 1 day before. Properties:
+   - `Name`: e.g. `Register: <name>`, `Submit: <name>`, `Reminder (3d): ...`
+   - `Status`: `Not started`; `Priority`: set it; `Multi-select`: `["Work"]`
+   - `date:Due date:start`, `date:Due date:end` (when a range), `date:Due date:is_datetime` (1 for timed, 0 for all-day). Timed values use the IST offset, e.g. `2026-11-15T09:00:00+05:30`.
+   - `To-Do Completion`: `["https://app.notion.com/p/e113c88f5f088358ac6181941813a2ac"]`. Without this relation the views hide the page.
+   - Put the hackathon URL in the page body.
+   Example: the Catalyst pages made on 2026-10-18 (e.g. page `3fd3c88f5f08818384eeed7844d61517`).
+4. Verify with `notion-calendar-list-events` that the pages appear in the "✅ To-Do Database" calendar. If they do not, the calendar may be unticked in Notion Calendar (`isSelected` false): tell the user to tick it. Never claim success before this check.
+5. Store the main page id: `hacks_db.py notion ID --submit <page id>`, and add `--reg <page id>` when there is a registration-deadline page.
+6. Do not move the hackathon to `registered` yourself. Tell the user to register on the site, then say so; then `status ID registered --note "team: ..."`.
 
 ## Mode: status
 - `hacks_db.py due --days 7` first (soonest first), then `list` per status for counts and a table of shortlisted/registered/submitted rows with dates. Export `tracker.csv`.
