@@ -168,6 +168,7 @@ def drift(with_personal: bool):
             found.append("setup.json: missing or different in ~/.claude")
         found += bridge_drift()
         found += claude_mcp_drift()
+        found += desktop_mcp_drift()
         found += writer_task_drift()
     return found
 
@@ -247,6 +248,24 @@ def claude_mcp_drift():
     want = {"type": "stdio", **server}
     if not live or {k: live.get(k) for k in want} != want:
         return ["~/.claude.json: user-scope basic-memory MCP server missing or changed"]
+    return []
+
+
+# Claude Desktop chat starts its own basic-memory process from this file, so it gets the same reader env.
+CLAUDE_DESKTOP_JSON = Path(os.environ.get("APPDATA", HOME / "AppData" / "Roaming")) / "Claude" / "claude_desktop_config.json"
+
+
+def desktop_mcp_drift():
+    """Drift finding for the basic-memory server in claude_desktop_config.json (only when Claude Desktop is installed)."""
+    if not CLAUDE_DESKTOP_JSON.parent.is_dir():
+        return []
+    try:
+        have = read_json_file(CLAUDE_DESKTOP_JSON)
+    except ValueError:
+        return ["claude_desktop_config.json: invalid JSON"]
+    want = want_mcp_json(have)
+    if want is not None and want != have:
+        return ["claude_desktop_config.json: basic-memory MCP server missing or changed"]
     return []
 
 
