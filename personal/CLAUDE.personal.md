@@ -23,6 +23,11 @@ My long-term notes are in `C:\Users\DELL\Brain` (a junction to `C:\Users\DELL\On
 - When you learn a lasting decision, gotcha or pattern, save it to the matching note following `Vault Rules.md`.
 - Never delete vault notes; the vault is in git.
 
+## Student Developer Pack tools
+I have GitHub Student Developer Pack benefits. The list of claimed and still-unclaimed tools is in the vault note `Projects/Student Developer Pack/Overview.md`.
+- When a project needs hosting, a database, ML compute, monitoring, secrets or similar, read that note and prefer those tools before paid or new services.
+- If a task needs any tool, account, API key or paid tier not marked as claimed there, tell me first and say why. For an unclaimed Pack credit, say so before I claim it, because its clock starts on claim.
+
 ## Claude setup repo
 My Claude Code setup (CLAUDE.md, skills, hooks, hook settings) is managed in the git repo `C:\Users\DELL\claude-setup`; it is the source of truth.
 - Change files in the repo, never directly in `~/.claude`. Shared, portable parts go at the top level (they also install on my friend's Mac); anything with this PC's paths or my personal data goes under `personal/`.
