@@ -252,7 +252,16 @@ def claude_mcp_drift():
 
 
 # Claude Desktop chat starts its own basic-memory process from this file, so it gets the same reader env.
-CLAUDE_DESKTOP_JSON = Path(os.environ.get("APPDATA", HOME / "AppData" / "Roaming")) / "Claude" / "claude_desktop_config.json"
+def claude_desktop_json() -> Path:
+    """The config file Claude Desktop reads. The Store (MSIX) build moves its user data from %APPDATA%\\Claude to
+    %LOCALAPPDATA%\\Claude-Data\\claude_<publisher id> and leaves only a `.user-data-left.*` marker behind."""
+    local = sorted(Path(os.environ.get("LOCALAPPDATA", HOME / "AppData" / "Local")).glob("Claude-Data/claude_*"),
+                   key=lambda p: p.stat().st_mtime, reverse=True)
+    base = local[0] if local else Path(os.environ.get("APPDATA", HOME / "AppData" / "Roaming")) / "Claude"
+    return base / "claude_desktop_config.json"
+
+
+CLAUDE_DESKTOP_JSON = claude_desktop_json()
 
 
 def desktop_mcp_drift():
