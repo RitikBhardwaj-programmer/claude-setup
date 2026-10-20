@@ -17,9 +17,10 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import (BRIDGE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG, HOME, IGNORE, PERSONAL,  # noqa: E402
-                       PLUGINS, agent_sources, compose_claude_md, drift, hook_sources, hooks_block, installed_plugins,
-                       is_link, merge_block, read_json_file, skill_sources)
+from setup_lib import (BRIDGE_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG, HOME, IGNORE,  # noqa: E402
+                       PERSONAL, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift, compose_claude_md,
+                       drift, hook_sources, hooks_block, installed_plugins, is_link, merge_block, read_json_file,
+                       skill_sources, writer_task_action, writer_task_drift)
 
 
 def main():
@@ -153,6 +154,47 @@ def main():
                         path.write_text(json.dumps(want, indent=2) + "\n", encoding="utf-8")
         else:
             print("NOTE: ~/.gemini/config not found; skipped Antigravity skills.json, MCP config and watcher sidecar.")
+
+        # 7. basic-memory: Claude Code user-scope server (via the `claude` CLI, which owns ~/.claude.json) and
+        # the single writer task. Running sessions keep their old server until they restart.
+        server = basic_memory_server()
+        if server and claude_mcp_drift():
+            claude = shutil.which("claude")
+            if not claude:
+                print("NOTE: `claude` CLI not found; set the basic-memory MCP server by hand (see README).")
+            else:
+                save(CLAUDE_JSON)
+                actions.append("~/.claude.json (basic-memory MCP server)")
+                if not a.dry_run:
+                    subprocess.run([claude, "mcp", "remove", "basic-memory", "-s", "user"], capture_output=True)
+                    r = subprocess.run([claude, "mcp", "add-json", "basic-memory",
+                                        json.dumps({"type": "stdio", **server}), "-s", "user"],
+                                       capture_output=True, text=True, encoding="utf-8")
+                    if r.returncode != 0:
+                        print(f"WARNING: claude mcp add-json failed: {(r.stderr or r.stdout).strip()}")
+        task = writer_task_action()
+        if task and writer_task_drift():
+            name, exe, args = task
+            actions.append(f"Task Scheduler: {name}")
+            if not a.dry_run:
+                q = lambda s: s.replace("'", "''")  # noqa: E731  (PowerShell single-quoted string)
+                ps = (f"$a = New-ScheduledTaskAction -Execute '{q(exe)}' -Argument '{q(args)}'; "
+                      "$t = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME; "
+                      "$s = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 3 "
+                      "-RestartInterval (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew "
+                      "-AllowStartIfOnBatteries -DontStopIfGoingOnBatteries; "
+                      f"Stop-ScheduledTask -TaskName '{name}' -ErrorAction SilentlyContinue; "
+                      # stopping the task ends conhost, not basic-memory.exe under it, which would keep the port
+                      "Get-CimInstance Win32_Process -Filter \"Name='basic-memory.exe'\" | Where-Object "
+                      "{ $_.CommandLine -like '*streamable-http*' } | ForEach-Object { Stop-Process -Id $_.ProcessId "
+                      "-Force }; "
+                      f"Register-ScheduledTask -TaskName '{name}' -Action $a -Trigger $t -Settings $s -Force "
+                      "-Description 'basic-memory: the only process that watches the Brain vault (claude-setup)' "
+                      f"| Out-Null; Start-ScheduledTask -TaskName '{name}'")
+                r = subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, text=True,
+                                   encoding="utf-8")
+                if r.returncode != 0:
+                    print(f"WARNING: could not register task {name}: {(r.stderr or r.stdout).strip()}")
 
     print(("DRY RUN - would install: " if a.dry_run else "Installed: ") + ", ".join(actions))
     if backed and not a.dry_run:
