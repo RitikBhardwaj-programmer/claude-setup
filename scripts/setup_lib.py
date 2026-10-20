@@ -167,6 +167,8 @@ def drift(with_personal: bool):
                              json.loads(sj.read_text(encoding="utf-8")) != json.loads(live_sj.read_text(encoding="utf-8"))):
             found.append("setup.json: missing or different in ~/.claude")
         found += bridge_drift()
+        found += claude_mcp_drift()
+        found += writer_task_drift()
     return found
 
 
@@ -202,16 +204,83 @@ def want_skills_json(have: dict) -> dict:
     return out
 
 
-def want_mcp_json(have: dict):
-    """mcp_config.json with the basic-memory server set (from personal/setup.json), or None when not configured."""
+def setup_key(key: str):
+    """One top-level value of personal/setup.json, or None."""
     sj = PERSONAL / "setup.json"
-    cfg = json.loads(sj.read_text(encoding="utf-8")).get("basic_memory_mcp") if sj.is_file() else None
+    return json.loads(sj.read_text(encoding="utf-8")).get(key) if sj.is_file() else None
+
+
+def basic_memory_server():
+    """The basic-memory stdio server entry (command, args, env) from personal/setup.json, or None."""
+    cfg = setup_key("basic_memory_mcp")
     if not cfg:
         return None
+    return {"command": cfg["command"], "args": cfg.get("args", []), "env": cfg.get("env", {})}
+
+
+def want_mcp_json(have: dict):
+    """mcp_config.json with the basic-memory server set (from personal/setup.json), or None when not configured."""
+    server = basic_memory_server()
+    if not server:
+        return None
     out = dict(have)
-    out["mcpServers"] = {**out.get("mcpServers", {}),
-                         "basic-memory": {"command": cfg["command"], "args": cfg.get("args", [])}}
+    out["mcpServers"] = {**out.get("mcpServers", {}), "basic-memory": server}
     return out
+
+
+# ---- basic-memory for Claude Code (user scope) and the single writer task ----
+# Every session starts its own basic-memory process. They are readers (no file watcher); one hidden
+# Task Scheduler process is the only watcher, so edits are not embedded by several processes at once.
+
+CLAUDE_JSON = HOME / ".claude.json"
+
+
+def claude_mcp_drift():
+    """Drift finding for the user-scope basic-memory server in ~/.claude.json (read only; `claude mcp` writes it)."""
+    server = basic_memory_server()
+    if not server:
+        return []
+    try:
+        live = read_json_file(CLAUDE_JSON).get("mcpServers", {}).get("basic-memory")
+    except ValueError:
+        return ["~/.claude.json: invalid JSON"]
+    want = {"type": "stdio", **server}
+    if not live or {k: live.get(k) for k in want} != want:
+        return ["~/.claude.json: user-scope basic-memory MCP server missing or changed"]
+    return []
+
+
+def writer_task_action():
+    """(task name, executable, arguments) of the writer task, or None when not configured. conhost --headless
+    keeps it windowless; cmd sets the env vars because Task Scheduler actions cannot. No space before && : cmd
+    keeps it in the value ("true " fails pydantic's bool parsing and the writer exits)."""
+    cfg, server = setup_key("basic_memory_writer"), basic_memory_server()
+    if not cfg or not server:
+        return None
+    sets = "".join(f"set {k}={v}&& " for k, v in cfg.get("env", {}).items())
+    inner = sets + f'"{server["command"]}" ' + " ".join(cfg["args"])
+    return cfg["task_name"], "conhost.exe", f'--headless cmd.exe /d /s /c "{inner}"'
+
+
+def live_task_action(name: str):
+    """(executable, arguments) of a scheduled task's first action, or None when the task does not exist."""
+    ps = (f"$t = Get-ScheduledTask -TaskName '{name}' -ErrorAction SilentlyContinue; "
+          "if ($t) { $t.Actions[0] | Select-Object Execute, Arguments | ConvertTo-Json -Compress }")
+    r = subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, text=True, encoding="utf-8")
+    if not r.stdout.strip():
+        return None
+    a = json.loads(r.stdout)
+    return a["Execute"], a["Arguments"]
+
+
+def writer_task_drift():
+    want = writer_task_action()
+    if not want:
+        return []
+    name, exe, args = want
+    if live_task_action(name) != (exe, args):
+        return [f"Task Scheduler: {name} (basic-memory writer) missing or changed"]
+    return []
 
 
 def want_sidecar_json(have: dict) -> dict:

@@ -14,6 +14,28 @@
       "mcp",
       "--project",
       "brain"
-    ]
+    ],
+    "env": {
+      "BASIC_MEMORY_INDEX_CHANGES": "false",
+      "BASIC_MEMORY_AUTO_UPDATE": "false"
+    }
+  },
+  "basic_memory_writer": {
+    "_comment": "The only basic-memory process that watches the vault (one watcher per session raced on search_vector_chunks). Runs hidden at logon as a Task Scheduler task, localhost only. Readers above have AUTO_UPDATE off because its save would write their INDEX_CHANGES=false into config.json; run `bm update` by hand.",
+    "task_name": "BasicMemoryWriter",
+    "args": [
+      "mcp",
+      "--project",
+      "brain",
+      "--transport",
+      "streamable-http",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "8765"
+    ],
+    "env": {
+      "BASIC_MEMORY_INDEX_CHANGES": "true"
+    }
   }
 }
