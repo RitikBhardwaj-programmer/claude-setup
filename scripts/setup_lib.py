@@ -119,6 +119,23 @@ def tree_diff(src: Path, dst: Path):
     return diffs
 
 
+def personal_plugin_config():
+    """(marketplaces {name: owner/repo}, plugin ids) from personal/setup.json's "plugins" key."""
+    cfg = setup_key("plugins") or {}
+    return dict(cfg.get("marketplaces") or {}), list(cfg.get("install") or [])
+
+
+def wanted_plugins(with_personal: bool):
+    """Plugin ids the setup expects: the shared PLUGINS, plus the personal ones on this PC."""
+    return PLUGINS + (personal_plugin_config()[1] if with_personal else [])
+
+
+def known_marketplaces():
+    """Names of the plugin marketplaces Claude Code already knows (empty set if the file is missing)."""
+    data = read_json_file(DEST / "plugins" / "known_marketplaces.json")
+    return set(data) if isinstance(data, dict) else set()
+
+
 def drift(with_personal: bool):
     """Return a list of human-readable drift findings (empty = in sync)."""
     found = []
@@ -146,7 +163,7 @@ def drift(with_personal: bool):
     if have is None:
         found.append("plugins: cannot check (the `claude` CLI is not on PATH)")
     else:
-        for p in PLUGINS:
+        for p in wanted_plugins(with_personal):
             if p not in have:
                 found.append(f"plugins: {p} is not installed")
     if with_personal:

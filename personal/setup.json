@@ -8,6 +8,15 @@
   "setup_install": "powershell -ExecutionPolicy Bypass -File C:/Users/DELL/claude-setup/install.ps1",
   "setup_check": "py -3 C:/Users/DELL/claude-setup/scripts/check_drift.py",
   "commit_trailer": "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "plugins": {
+    "_comment": "Personal marketplace plugins for this PC only (shared ones are PLUGINS in scripts/setup_lib.py). marketplaces: name -> GitHub owner/repo, added with `claude plugin marketplace add` when missing.",
+    "marketplaces": {
+      "neon": "neondatabase/agent-skills"
+    },
+    "install": [
+      "neon-postgres@neon"
+    ]
+  },
   "basic_memory_mcp": {
     "command": "C:/Users/DELL/.local/bin/basic-memory.exe",
     "args": [

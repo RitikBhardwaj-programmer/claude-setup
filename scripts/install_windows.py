@@ -18,9 +18,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
-                       HOME, IGNORE, PERSONAL, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
-                       compose_claude_md, drift, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
-                       read_json_file, skill_sources, want_mcp_json, writer_task_action, writer_task_drift)
+                       HOME, IGNORE, PERSONAL, agent_sources, basic_memory_server, claude_mcp_drift,
+                       compose_claude_md, drift, hook_sources, hooks_block, installed_plugins, is_link,
+                       known_marketplaces, merge_block, personal_plugin_config, read_json_file, skill_sources,
+                       want_mcp_json, wanted_plugins, writer_task_action, writer_task_drift)
 
 
 def main():
@@ -79,10 +80,23 @@ def main():
 
     # 2c. Marketplace plugins (needs the `claude` CLI)
     have = installed_plugins()
+    plugins = wanted_plugins(personal)
     if have is None:
         print("NOTE: `claude` CLI not found; install these plugins by hand: " +
-              ", ".join(f"claude plugin install {p}" for p in PLUGINS))
-    for p in PLUGINS:
+              ", ".join(f"claude plugin install {p}" for p in plugins))
+    elif personal:
+        # Personal marketplaces (personal/setup.json) must be known before their plugins can install.
+        known = known_marketplaces()
+        for name, repo in personal_plugin_config()[0].items():
+            if name in known:
+                continue
+            actions.append(f"marketplace {name} ({repo})")
+            if not a.dry_run:
+                r = subprocess.run([shutil.which("claude"), "plugin", "marketplace", "add", repo],
+                                   capture_output=True, text=True, encoding="utf-8")
+                if r.returncode != 0:
+                    print(f"WARNING: marketplace add failed for {repo}: {(r.stderr or r.stdout).strip()}")
+    for p in plugins:
         if have is None or p in have:
             continue
         actions.append(f"plugin {p}")
