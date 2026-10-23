@@ -1,0 +1,17 @@
+{
+  "_comment": "skillOverrides block of ~/.claude/settings.json (install.ps1 writes it, check_drift.py checks it). name-only = Claude sees the name but not the description; the skill still runs by name and stays in the / menu. Chosen 2026-10-23 from 0 uses in 554 session logs, to cut the skill listing re-read on every response.",
+  "skillOverrides": {
+    "improve-setup": "name-only",
+    "lab-experiment-log": "name-only",
+    "llm-council": "name-only",
+    "vendor-requirements-spec": "name-only",
+    "simplify": "name-only",
+    "fewer-permission-prompts": "name-only",
+    "loop": "name-only",
+    "schedule": "name-only",
+    "init": "name-only",
+    "security-review": "name-only",
+    "keybindings-help": "name-only",
+    "run": "name-only"
+  }
+}

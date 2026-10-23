@@ -94,6 +94,12 @@ def hooks_block():
     return json.loads((PERSONAL / "settings.hooks.json").read_text(encoding="utf-8"))["hooks"]
 
 
+def skill_overrides_block():
+    """The skillOverrides block for settings.json, or None when the repo manages none."""
+    f = PERSONAL / "settings.skill-overrides.json"
+    return json.loads(f.read_text(encoding="utf-8"))["skillOverrides"] if f.is_file() else None
+
+
 def tree_diff(src: Path, dst: Path):
     """List of relative paths that differ between two folders (missing, extra or changed files)."""
     if not dst.is_dir():
@@ -156,11 +162,14 @@ def drift(with_personal: bool):
                 found.append(f"hooks/{h.name}: missing or changed in ~/.claude")
         settings = DEST / "settings.json"
         try:
-            live_hooks = json.loads(settings.read_text(encoding="utf-8")).get("hooks")
+            live_settings = json.loads(settings.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            live_hooks = None
-        if live_hooks != hooks_block():
+            live_settings = {}
+        if live_settings.get("hooks") != hooks_block():
             found.append("settings.json: hooks block differs from personal/settings.hooks.json")
+        overrides = skill_overrides_block()
+        if overrides is not None and live_settings.get("skillOverrides") != overrides:
+            found.append("settings.json: skillOverrides differs from personal/settings.skill-overrides.json")
         sj = PERSONAL / "setup.json"
         live_sj = DEST / "setup.json"
         if sj.is_file() and (not live_sj.is_file() or
