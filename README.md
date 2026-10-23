@@ -97,7 +97,7 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 | `PLUGINS` in `scripts/setup_lib.py` and `install.sh` | Marketplace plugins the installers add with `claude plugin install` (frontend-design, claude-security); keep both lists the same | Mac and Windows |
 | `personal/CLAUDE.personal.md` | My personal rules (explanation style, Windows shell, Brain vault, this workflow), appended to `CLAUDE.md` | Windows only |
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
-| `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, retro nudge, handoff reminder) and their registration | Windows only |
+| `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, long-heredoc guard, retro nudge, handoff reminder) and their registration | Windows only |
 | `personal/setup.json` | Per-machine paths read by the portable skills (Python, retro notes, notes repo, this repo) | Windows only |
 | `shared/agent-bridge-rules.md` | The short rules block (handoff protocol, one writer per file set, never wrap another vendor's agent) that the Windows installer merges into `~/.codex/AGENTS.md` | Windows only (for now) |
 | `scripts/` | Windows installer logic and the drift check | — |

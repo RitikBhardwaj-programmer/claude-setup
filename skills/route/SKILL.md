@@ -30,6 +30,7 @@ Rules:
 - **Raise the model when failure is quiet.** If a wrong answer would look right (design, concurrency, auth, maths), use the stronger model. If a failure is loud (a test fails at once), use the cheaper one.
 - **Effort is a separate dial.** High effort on a rename wastes thinking tokens. Low effort on a plan makes a shallow plan, and every later phase pays for it.
 - **Switch at phase borders only.** Prompt caching (the provider stores the repeated context so re-reading it costs less) is per model. After a model switch, the next turn re-reads the whole context uncached. A fresh session for the build phase avoids this, and it also starts with a small context.
+- **Check this session's own model first.** "Main session" means this session at its current price. If this session runs a stronger model or effort than a phase needs (for example opus high for a sonnet build), give that phase to a new session or a subagent, not "main session".
 - **Do not use a model that is dominated** (another model scores higher and costs less per task). See `references/models.md`.
 
 ## Step 3: Codex handoff candidates
