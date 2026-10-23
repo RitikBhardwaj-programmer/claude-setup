@@ -14,7 +14,7 @@ const hiddenLevel = atom({ plugin: 'token-saver', key: 'hiddenLevel' } as const,
 const isVisual = atom({ plugin: 'token-saver', key: 'isVisual' } as const, false)
 const tick = atom({ plugin: 'token-saver', key: 'tick' } as const, 0)
 
-type Row = { id: string; project: string; tokens: number; minutesLeft: number; cost: number; isMine: boolean }
+type Row = { id: string; label: string; tokens: number; minutesLeft: number; isMine: boolean }
 type Item = { name?: string; input?: Record<string, unknown> }
 
 // 200k, 300k, 400k ...; 0 below the first threshold.
@@ -28,6 +28,17 @@ export const withScale = (input: Record<string, unknown>): Record<string, unknow
     : input
 
 const k = (n: number) => `${Math.round(n / 1000)}k`
+
+// Which advice group a session falls in, by context size.
+export const sectionOf = (tokens: number): 'Hand off' | 'Optional' | 'Let it go' =>
+  tokens >= 150_000 ? 'Hand off' : tokens >= 60_000 ? 'Optional' : 'Let it go'
+
+const SECTIONS = ['Hand off', 'Optional', 'Let it go'] as const
+
+const clock = (ms: number) => {
+  const d = new Date(ms)
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
 
 const baseName = (path: string) => path.split(/[\\/]/).filter(Boolean).pop() ?? path
 
@@ -53,22 +64,23 @@ async function loadRows($: any): Promise<Row[]> {
       const tokens = Number(data.tokens) || 0
       rows.push({
         id: entry.name.replace(/\.json$/, ''),
-        project: baseName(String(data.cwd ?? '')),
+        label: Number(data.startMs) > 0
+          ? `${baseName(String(data.cwd ?? ''))} · ${clock(Number(data.startMs))}`
+          : baseName(String(data.cwd ?? '')),
         tokens,
         minutesLeft: Math.max(0, Math.ceil(CACHE_MIN - age)),
-        cost: tokens * 2,
         isMine: data.sessionId === mine,
       })
     } catch {
       // A half-written or foreign file is skipped.
     }
   }
-  return rows.sort((a, b) => b.cost - a.cost)
+  return rows.sort((a, b) => b.tokens - a.tokens)
 }
 
-const rowText = (r: Row) =>
-  `${r.isMine ? '* ' : ''}${r.project}: context ${k(r.tokens)}, cache ends in ~${r.minutesLeft} min, ` +
-  `a cold restart costs ~${k(r.cost)} cache-write units`
+const detail = (r: Row) => `${k(r.tokens)} context · cold in ${r.minutesLeft} min`
+
+const rowText = (r: Row) => `${r.isMine ? '(this session) ' : ''}${r.label}: ${detail(r)}`
 
 const NOTE =
   'token-saver: many Read/Grep/Glob calls this turn. For broad exploration, ' +
@@ -81,9 +93,11 @@ export const register: Register = (on, options) => {
   const isDeferOn = options.deferBrowserTools !== false
 
   let reads = 0
+  let startMs = 0
   let hasNudged = false
 
   on('session.start', async ($, e, next) => {
+    startMs = await $.clock.now()
     await $.command.register({ name: 'warm', description: 'Show sessions whose prompt cache is probably still warm' })
     await $.command.register({
       name: 'token-saver',
@@ -116,11 +130,17 @@ export const register: Register = (on, options) => {
       const dir = await sessionsDir($)
       if (dir && e.changed.includes('context')) {
         const sessionId = await $.session.id()
-        await $.fs.write(
-          `${dir}/${sessionId}.json`,
-          JSON.stringify({ sessionId, cwd: await $.session.cwd(), tokens, lastResponseMs: await $.clock.now() }),
-        )
+        const file = `${dir}/${sessionId}.json`
         const now = await $.clock.now()
+        if (startMs === 0) {
+          // After a reload the module forgot its start time: keep the one in the file.
+          const old = await $.fs.read(file).then((t: string) => Number(JSON.parse(t).startMs)).catch(() => 0)
+          startMs = old > 0 ? old : now
+        }
+        await $.fs.write(
+          file,
+          JSON.stringify({ sessionId, cwd: await $.session.cwd(), tokens, startMs, lastResponseMs: now }),
+        )
         await update($, tick, () => now)
       }
     } catch {
@@ -159,11 +179,36 @@ export const register: Register = (on, options) => {
     const rows = await loadRows($)
     return (
       <Box flexDirection="column">
-        <Text dimColor>Estimate: the cache state is inferred from a 1-hour TTL, not read from the server.</Text>
-        {rows.length === 0 && <Text>No session wrote a response in the last 60 minutes.</Text>}
-        {rows.map(r => (
-          <Text>{rowText(r)}</Text>
-        ))}
+        <Text bold>Before a break</Text>
+        <Text dimColor>Cache expires about 1 h after the last reply (estimate, not read from the server).</Text>
+        {rows.length === 0 && (
+          <Box marginTop={1}>
+            <Text>No session has a warm cache right now.</Text>
+          </Box>
+        )}
+        {SECTIONS.map(section => {
+          const group = rows.filter(r => sectionOf(r.tokens) === section)
+          if (group.length === 0) return null
+          return (
+            <Box flexDirection="column" marginTop={1}>
+              <Text bold color="warning">{section}</Text>
+              {group.map(r => (
+                <Box flexDirection="column" marginTop={1} paddingLeft={1}>
+                  <Text bold>
+                    {r.label}
+                    {r.isMine && <Text dimColor> [this session]</Text>}
+                  </Text>
+                  <Text dimColor>
+                    {k(r.tokens)} context · <Text dimColor={r.minutesLeft >= 10} color={r.minutesLeft < 10 ? 'warning' : undefined}>cold in {r.minutesLeft} min</Text>
+                  </Text>
+                </Box>
+              ))}
+            </Box>
+          )
+        })}
+        <Box marginTop={1}>
+          <Text dimColor>Updates every minute</Text>
+        </Box>
       </Box>
     )
   }).catch(($, e, next) => next(e))

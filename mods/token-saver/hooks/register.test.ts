@@ -121,3 +121,77 @@ test('E: the switch turns deferral off', { options: { deferBrowserTools: false }
   })
   expect(browser.isDeferred).toBe(undefined)
 })
+
+const WARM = {
+  plugin: 'token-saver',
+  component: 'Pane',
+  requestId: 'warm',
+  props: {
+    title: 'Warm sessions',
+    isFocused: false,
+    bodyColumns: 60,
+    placement: 'dock',
+    scroll: { offset: 0, bodyRows: 30 },
+    view: {},
+  },
+} as const
+
+const NOW = 1_800_000_000_000
+
+// One status file per session: [file name, context tokens, minutes since the last reply, id]
+const mountWarm = async ($: any, on: any, files: [string, number, number, string][]) => {
+  on('env.get', () => ({ value: 'C:/Users/test' }))
+  on('session.id', () => ({ value: 'me' }))
+  on('clock.now', () => ({ value: NOW }))
+  on('fs.list', () => ({
+    value: files.map(([name]) => ({ name, kind: 'file', size: 1, mtimeMs: NOW, isLink: false })),
+  }))
+  on('fs.read', (_: any, e: any) => {
+    const f = files.find(([name]) => e.path.endsWith(name))
+    const [, tokens, ageMin, id] = f!
+    return {
+      value: JSON.stringify({
+        sessionId: id,
+        cwd: 'C:/proj/claude-setup',
+        tokens,
+        startMs: NOW - 3_600_000,
+        lastResponseMs: NOW - ageMin * 60_000,
+      }),
+    }
+  })
+  return $.ui.mount({ ...WARM, surface: 'desktop' })
+}
+
+test('pane: groups split at 150k and 60k, largest first', async ($, on) => {
+  const ui = await mountWarm($, on, [
+    ['a.json', 149_000, 5, 'a'],
+    ['b.json', 150_000, 5, 'b'],
+    ['c.json', 59_000, 5, 'c'],
+    ['d.json', 60_000, 5, 'd'],
+  ])
+  const text = async (re: RegExp) => (await ui.find({ type: 'Text', text: re }))?.text
+  expect(await text(/^Hand off$/)).toBe('Hand off')
+  expect(await text(/^Optional$/)).toBe('Optional')
+  expect(await text(/^Let it go$/)).toBe('Let it go')
+  expect(await text(/^150k context/)).toBeTruthy()
+  expect(await text(/^149k context/)).toBeTruthy()
+  expect(await text(/^60k context/)).toBeTruthy()
+  expect(await text(/^59k context/)).toBeTruthy()
+  expect(await text(/cache-write/)).toBe(undefined)
+  await ui.unmount()
+})
+
+test('pane: empty groups are hidden, current session is tagged', async ($, on) => {
+  const ui = await mountWarm($, on, [['me.json', 80_000, 5, 'me']])
+  expect(await ui.find({ type: 'Text', text: /^Optional$/ })).toBeTruthy()
+  expect(await ui.find({ type: 'Text', text: /^Hand off$/ })).toBeFalsy()
+  expect(await ui.find({ type: 'Text', text: /\[this session\]/ })).toBeTruthy()
+  await ui.unmount()
+})
+
+test('pane: empty state', async ($, on) => {
+  const ui = await mountWarm($, on, [])
+  expect((await ui.find({ type: 'Text', text: /No session has a warm cache right now/ }))?.text).toBeTruthy()
+  expect(await ui.find({ type: 'Text', text: /Updates every minute/ })).toBeTruthy()
+  await ui.unmount()
+})
