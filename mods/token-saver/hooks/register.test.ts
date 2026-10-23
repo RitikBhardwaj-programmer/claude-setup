@@ -139,7 +139,7 @@ const WARM = {
 const NOW = 1_800_000_000_000
 
 // One status file per session: [file name, context tokens, minutes since the last reply, id]
-const mountWarm = async ($: any, on: any, files: [string, number, number, string][]) => {
+const mountWarm = async ($: any, on: any, files: [string, number, number, string][], extra: object = {}) => {
   on('env.get', () => ({ value: 'C:/Users/test' }))
   on('session.id', () => ({ value: 'me' }))
   on('clock.now', () => ({ value: NOW }))
@@ -155,6 +155,7 @@ const mountWarm = async ($: any, on: any, files: [string, number, number, string
         cwd: 'C:/proj/claude-setup',
         tokens,
         startMs: NOW - 3_600_000,
+        ...extra,
         lastResponseMs: NOW - ageMin * 60_000,
       }),
     }
@@ -194,4 +195,53 @@ test('pane: empty state', async ($, on) => {
   expect((await ui.find({ type: 'Text', text: /No session has a warm cache right now/ }))?.text).toBeTruthy()
   expect(await ui.find({ type: 'Text', text: /Updates every minute/ })).toBeTruthy()
   await ui.unmount()
+})
+
+test('pane: the session title leads the card', async ($, on) => {
+  const ui = await mountWarm($, on, [['me.json', 80_000, 5, 'me']], { title: 'Build token-saver mod' })
+  expect(await ui.find({ type: 'Text', text: /Build token-saver mod/ })).toBeTruthy()
+  await ui.unmount()
+})
+
+test('pane: no title falls back to project and the real start time', async ($, on) => {
+  const ui = await mountWarm($, on, [['me.json', 80_000, 5, 'me']])
+  expect(await ui.find({ type: 'Text', text: /claude-setup · \d\d:\d\d/ })).toBeTruthy()
+  await ui.unmount()
+})
+
+test('measure: the status file gets the app title and the real start time', async ($, on) => {
+  const written: Record<string, string> = {}
+  const dir = (name: string) => ({ name, kind: 'directory', size: 0, mtimeMs: 0, isLink: false })
+  const file = (name: string, mtimeMs: number) => ({ name, kind: 'file', size: 1, mtimeMs, isLink: false })
+  const base = 'C:/Users/test/AppData/Local/Claude-Data'
+  const deep = `${base}/x/claude-code-sessions/acct/org`
+  const p = (e: { path: string }) => e.path.replaceAll('\\', '/')
+  on('env.get', (_, e) => ({ value: e.name === 'LOCALAPPDATA' ? 'C:/Users/test/AppData/Local' : 'C:/Users/test' }))
+  on('session.id', () => ({ value: 'cli-1' }))
+  on('session.cwd', () => ({ value: 'C:/proj/claude-setup' }))
+  on('session.usage', () => ({ value: { startedAt: 1_700_000_000_000, context: {}, rateLimits: [] } }) as any)
+  on('clock.now', () => ({ value: NOW }))
+  on('session.measure', (_, e) => ({ changed: e.changed }))
+  on('fs.list', (_, e: any) => ({
+    value:
+      p(e) === base ? [dir('x')]
+      : p(e) === `${base}/x/claude-code-sessions` ? [dir('acct')]
+      : p(e) === `${base}/x/claude-code-sessions/acct` ? [dir('org')]
+      : p(e) === deep ? [file('local_other.json', 2), file('local_mine.json', 1)]
+      : [],
+  }) as any)
+  on('fs.read', (_, e: any) => ({
+    value: p(e).endsWith('local_mine.json') ? JSON.stringify({ cliSessionId: 'cli-1', title: 'Real title' })
+      : p(e).endsWith('local_other.json') ? JSON.stringify({ cliSessionId: 'cli-2', title: 'Other' })
+      : '',
+  }))
+  on('fs.write', (_, e: any) => {
+    written[p(e)] = e.text
+    return { value: undefined }
+  })
+
+  await $.session.measure({ context: { tokens: 90_000, window: 1_000_000 }, rateLimits: [], changed: ['context'] })
+  const saved = JSON.parse(written['C:/Users/test/.claude/token-saver/sessions/cli-1.json'] ?? '{}')
+  expect(saved.title).toBe('Real title')
+  expect(saved.startMs).toBe(1_700_000_000_000)
 })

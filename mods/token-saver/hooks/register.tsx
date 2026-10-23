@@ -64,9 +64,11 @@ async function loadRows($: any): Promise<Row[]> {
       const tokens = Number(data.tokens) || 0
       rows.push({
         id: entry.name.replace(/\.json$/, ''),
-        label: Number(data.startMs) > 0
-          ? `${baseName(String(data.cwd ?? ''))} · ${clock(Number(data.startMs))}`
-          : baseName(String(data.cwd ?? '')),
+        label: data.title
+          ? String(data.title)
+          : Number(data.startMs) > 0
+            ? `${baseName(String(data.cwd ?? ''))} · ${clock(Number(data.startMs))}`
+            : baseName(String(data.cwd ?? '')),
         tokens,
         minutesLeft: Math.max(0, Math.ceil(CACHE_MIN - age)),
         isMine: data.sessionId === mine,
@@ -76,6 +78,32 @@ async function loadRows($: any): Promise<Row[]> {
     }
   }
   return rows.sort((a, b) => b.tokens - a.tokens)
+}
+
+// The desktop app keeps one JSON file per session (its own id "local_<uuid>", its title, and the engine's
+// id as cliSessionId; the title is what this mod reads) three folders under Claude-Data/<x>/claude-code-sessions. Undocumented, so every
+// failure here only means "no title, no link".
+async function findAppSession($: any, cliId: string): Promise<string | undefined> {
+  const local = await $.env.get('LOCALAPPDATA')
+  if (!local) return undefined
+  const root = String(local).replace(/[\\/]$/, '') + '/Claude-Data'
+  const dirs = async (d: string) => (await $.fs.list(d).catch(() => [])).filter((x: any) => x.kind === 'directory')
+  for (const a of await dirs(root)) {
+    for (const b of await dirs(`${root}/${a.name}/claude-code-sessions`)) {
+      for (const c of await dirs(`${root}/${a.name}/claude-code-sessions/${b.name}`)) {
+        const folder = `${root}/${a.name}/claude-code-sessions/${b.name}/${c.name}`
+        const files = (await $.fs.list(folder).catch(() => []))
+          .filter((f: any) => f.kind === 'file' && f.name.startsWith('local_') && f.name.endsWith('.json'))
+          .sort((x: any, y: any) => y.mtimeMs - x.mtimeMs)
+          .slice(0, 60)
+        for (const f of files) {
+          const text = await $.fs.read(`${folder}/${f.name}`).catch(() => '')
+          if (text.includes(cliId)) return `${folder}/${f.name}`
+        }
+      }
+    }
+  }
+  return undefined
 }
 
 const detail = (r: Row) => `${k(r.tokens)} context · cold in ${r.minutesLeft} min`
@@ -93,11 +121,11 @@ export const register: Register = (on, options) => {
   const isDeferOn = options.deferBrowserTools !== false
 
   let reads = 0
-  let startMs = 0
+  let appSession: string | undefined
+  let hookTitle = ''
   let hasNudged = false
 
   on('session.start', async ($, e, next) => {
-    startMs = await $.clock.now()
     await $.command.register({ name: 'warm', description: 'Show sessions whose prompt cache is probably still warm' })
     await $.command.register({
       name: 'token-saver',
@@ -113,6 +141,12 @@ export const register: Register = (on, options) => {
     })
     return next(e)
   })
+
+  // The title the engine reports on a prompt (may be empty before the session is named).
+  on('classic.UserPromptSubmit', async ($, e, next) => {
+    if (typeof e.session_title === 'string' && e.session_title) hookTitle = e.session_title
+    return next(e)
+  }).catch(($, e, next) => next(e))
 
   // ---- A + B: handoff warning, and the per-session file the /warm pane reads ----
   on('session.measure', async ($, e, next) => {
@@ -132,14 +166,27 @@ export const register: Register = (on, options) => {
         const sessionId = await $.session.id()
         const file = `${dir}/${sessionId}.json`
         const now = await $.clock.now()
-        if (startMs === 0) {
-          // After a reload the module forgot its start time: keep the one in the file.
-          const old = await $.fs.read(file).then((t: string) => Number(JSON.parse(t).startMs)).catch(() => 0)
-          startMs = old > 0 ? old : now
+        const { startedAt } = await $.session.usage()
+        let title = hookTitle
+        try {
+          appSession ??= await findAppSession($, sessionId)
+          if (appSession) {
+            const meta = JSON.parse(await $.fs.read(appSession))
+            if (typeof meta.title === 'string' && meta.title) title = meta.title
+          }
+        } catch {
+          appSession = undefined
         }
         await $.fs.write(
           file,
-          JSON.stringify({ sessionId, cwd: await $.session.cwd(), tokens, startMs, lastResponseMs: now }),
+          JSON.stringify({
+            sessionId,
+            cwd: await $.session.cwd(),
+            tokens,
+            title,
+            startMs: startedAt,
+            lastResponseMs: now,
+          }),
         )
         await update($, tick, () => now)
       }
