@@ -245,3 +245,28 @@ test('measure: the status file gets the app title and the real start time', asyn
   expect(saved.title).toBe('Real title')
   expect(saved.startMs).toBe(1_700_000_000_000)
 })
+
+test('pane: Hand off sends the request to another session, and fills the prompt for this one', async ($, on) => {
+  const sent: { to: unknown; text: string }[] = []
+  const filled: string[] = []
+  on('session.send', (_: any, e: any) => {
+    sent.push({ to: e.to, text: e.text })
+    return { isDelivered: true } as any
+  })
+  on('prompt.fill', (_: any, e: any) => {
+    filled.push(e.text)
+    return { isFilled: true } as any
+  })
+  on('ui.toast', () => ({ value: undefined }))
+  const ui = await mountWarm($, on, [
+    ['other.json', 200_000, 5, 'other'],
+    ['me.json', 100_000, 5, 'me'],
+  ])
+  await ui.press({ key: 'handoff-other' })
+  expect(sent.length).toBe(1)
+  expect(String(sent[0]?.text)).toMatch(/context-handoff/)
+  await ui.press({ key: 'handoff-me' })
+  expect(filled).toEqual(['/context-handoff'])
+  expect(sent.length).toBe(1)
+  await ui.unmount()
+})

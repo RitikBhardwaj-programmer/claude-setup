@@ -106,6 +106,25 @@ async function findAppSession($: any, cliId: string): Promise<string | undefined
   return undefined
 }
 
+const HANDOFF_ASK =
+  'token-saver: the user pressed "Hand off" for this session in the /warm pane. ' +
+  'Please run the context-handoff skill now and show the user the handoff text, so they can continue in a new session.'
+
+// Own session: fill the prompt (never submits). Another session: send it a message asking for the handoff.
+async function handOff($: any, r: Row): Promise<void> {
+  try {
+    if (r.isMine) {
+      await $.prompt.fill({ text: '/context-handoff' })
+      $.ui.toast('Prompt filled with /context-handoff: press Enter to run it')
+      return
+    }
+    const sent = await $.session.send({ to: { sessionId: r.id }, text: HANDOFF_ASK })
+    $.ui.toast(sent.isDelivered ? `Asked "${r.label}" to run /context-handoff` : `Not sent: ${sent.reason ?? 'unknown reason'}`)
+  } catch {
+    $.ui.toast('Could not send the hand-off request')
+  }
+}
+
 const detail = (r: Row) => `${k(r.tokens)} context · cold in ${r.minutesLeft} min`
 
 const rowText = (r: Row) => `${r.isMine ? '(this session) ' : ''}${r.label}: ${detail(r)}`
@@ -222,7 +241,7 @@ export const register: Register = (on, options) => {
 
   on('ui.render', { component: 'Pane', requestId: WARM_PANE }, async ($, e) => {
     await read($, tick)
-    const { Box, Text } = $.ui.resolve(e)
+    const { Box, Button, Text } = $.ui.resolve(e)
     const rows = await loadRows($)
     return (
       <Box flexDirection="column">
@@ -240,14 +259,17 @@ export const register: Register = (on, options) => {
             <Box flexDirection="column" marginTop={1}>
               <Text bold color="warning">{section}</Text>
               {group.map(r => (
-                <Box flexDirection="column" marginTop={1} paddingLeft={1}>
-                  <Text bold>
-                    {r.label}
-                    {r.isMine && <Text dimColor> [this session]</Text>}
-                  </Text>
-                  <Text dimColor>
-                    {k(r.tokens)} context · <Text dimColor={r.minutesLeft >= 10} color={r.minutesLeft < 10 ? 'warning' : undefined}>cold in {r.minutesLeft} min</Text>
-                  </Text>
+                <Box flexDirection="row" justifyContent="space-between" marginTop={1} paddingLeft={1}>
+                  <Box flexDirection="column">
+                    <Text bold>
+                      {r.label}
+                      {r.isMine && <Text dimColor> [this session]</Text>}
+                    </Text>
+                    <Text dimColor>
+                      {k(r.tokens)} context · <Text dimColor={r.minutesLeft >= 10} color={r.minutesLeft < 10 ? 'warning' : undefined}>cold in {r.minutesLeft} min</Text>
+                    </Text>
+                  </Box>
+                  <Button key={`handoff-${r.id}`} label="Hand off" onPress={() => handOff($, r)} />
                 </Box>
               ))}
             </Box>
