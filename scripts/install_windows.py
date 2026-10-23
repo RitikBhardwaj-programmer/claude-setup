@@ -1,6 +1,6 @@
 """Install this repo into ~/.claude on Windows: shared + personal parts, subagents, marketplace plugins, hooks,
-setup.json, the hooks block of settings.json and the agent bridge (Codex rules block, Antigravity skills.json and
-basic-memory MCP entry). Everything it replaces is backed up first. Called by install.ps1.
+setup.json, the hooks and skillOverrides blocks of settings.json and the agent bridge (Codex rules block, Antigravity
+skills.json and basic-memory MCP entry). Everything it replaces is backed up first. Called by install.ps1.
 
   py -3 scripts/install_windows.py [--dry-run] [--shared-only]
 
@@ -20,7 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
                        HOME, IGNORE, PERSONAL, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
-                       read_json_file, skill_sources, want_mcp_json, writer_task_action, writer_task_drift)
+                       read_json_file, skill_overrides_block, skill_sources, want_mcp_json, writer_task_action,
+                       writer_task_drift)
 
 
 def main():
@@ -108,13 +109,17 @@ def main():
             actions.append("setup.json")
             if not a.dry_run:
                 shutil.copy2(sj, DEST / "setup.json")
-        # 5. settings.json: replace only the hooks block
+        # 5. settings.json: replace only the hooks and skillOverrides blocks
         settings_path = DEST / "settings.json"
         settings = json.loads(settings_path.read_text(encoding="utf-8")) if settings_path.is_file() else {}
-        if settings.get("hooks") != hooks_block():
+        want = {"hooks": hooks_block()}
+        if skill_overrides_block() is not None:
+            want["skillOverrides"] = skill_overrides_block()
+        changed = [k for k, v in want.items() if settings.get(k) != v]
+        if changed:
             save(settings_path)
-            settings["hooks"] = hooks_block()
-            actions.append("settings.json (hooks block)")
+            settings.update({k: want[k] for k in changed})
+            actions.append(f"settings.json ({', '.join(changed)} block)")
             if not a.dry_run:
                 settings_path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
         # warn about hook commands that point at missing files
