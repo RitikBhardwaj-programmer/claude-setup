@@ -14,7 +14,7 @@ const hiddenLevel = atom({ plugin: 'token-saver', key: 'hiddenLevel' } as const,
 const isVisual = atom({ plugin: 'token-saver', key: 'isVisual' } as const, false)
 const tick = atom({ plugin: 'token-saver', key: 'tick' } as const, 0)
 
-type Row = { id: string; label: string; tokens: number; minutesLeft: number; isMine: boolean }
+type Row = { id: string; label: string; tokens: number; minutesLeft: number; isMine: boolean; appId?: string }
 type Item = { name?: string; input?: Record<string, unknown> }
 
 // 200k, 300k, 400k ...; 0 below the first threshold.
@@ -64,6 +64,7 @@ async function loadRows($: any): Promise<Row[]> {
       const tokens = Number(data.tokens) || 0
       rows.push({
         id: entry.name.replace(/\.json$/, ''),
+        appId: typeof data.appId === 'string' && /^local_[0-9a-f-]+$/.test(data.appId) ? data.appId : undefined,
         label: data.title
           ? String(data.title)
           : Number(data.startMs) > 0
@@ -106,11 +107,8 @@ async function findAppSession($: any, cliId: string): Promise<string | undefined
   return undefined
 }
 
-const HANDOFF_ASK =
-  'token-saver: the user pressed "Hand off" for this session in the /warm pane. ' +
-  'Please run the context-handoff skill now and show the user the handoff text, so they can continue in a new session.'
-
-// Own session: fill the prompt (never submits). Another session: send it a message asking for the handoff.
+// Own session: fill the prompt with the skill. Another session: fill the prompt with a request the person
+// sends themselves (a mod's own SendMessage is refused in auto mode, and rightly). Never submits.
 async function handOff($: any, r: Row): Promise<void> {
   try {
     if (r.isMine) {
@@ -118,10 +116,13 @@ async function handOff($: any, r: Row): Promise<void> {
       $.ui.toast('Prompt filled with /context-handoff: press Enter to run it')
       return
     }
-    const sent = await $.session.send({ to: { sessionId: r.id }, text: HANDOFF_ASK })
-    $.ui.toast(sent.isDelivered ? `Asked "${r.label}" to run /context-handoff` : `Not sent: ${sent.reason ?? 'unknown reason'}`)
+    const who = r.appId ?? r.id
+    await $.prompt.fill({
+      text: `Ask session "${r.label}" (${who}) to run /context-handoff and show me the handoff text.`,
+    })
+    $.ui.toast(`Prompt filled: press Enter to ask ${r.label} for a handoff`)
   } catch {
-    $.ui.toast('Could not send the hand-off request')
+    $.ui.toast('Could not fill the prompt')
   }
 }
 
@@ -203,6 +204,7 @@ export const register: Register = (on, options) => {
             cwd: await $.session.cwd(),
             tokens,
             title,
+            appId: appSession?.split('/').pop()?.replace(/\.json$/, ''),
             startMs: startedAt,
             lastResponseMs: now,
           }),

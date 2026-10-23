@@ -246,11 +246,11 @@ test('measure: the status file gets the app title and the real start time', asyn
   expect(saved.startMs).toBe(1_700_000_000_000)
 })
 
-test('pane: Hand off sends the request to another session, and fills the prompt for this one', async ($, on) => {
-  const sent: { to: unknown; text: string }[] = []
+test('pane: Hand off fills the prompt, with title and app id for another session, and sends nothing', async ($, on) => {
   const filled: string[] = []
-  on('session.send', (_: any, e: any) => {
-    sent.push({ to: e.to, text: e.text })
+  let sends = 0
+  on('session.send', () => {
+    sends += 1
     return { isDelivered: true } as any
   })
   on('prompt.fill', (_: any, e: any) => {
@@ -258,15 +258,27 @@ test('pane: Hand off sends the request to another session, and fills the prompt 
     return { isFilled: true } as any
   })
   on('ui.toast', () => ({ value: undefined }))
-  const ui = await mountWarm($, on, [
-    ['other.json', 200_000, 5, 'other'],
-    ['me.json', 100_000, 5, 'me'],
-  ])
+  const ui = await mountWarm($, on, [['other.json', 200_000, 5, 'other'], ['me.json', 100_000, 5, 'me']], {})
   await ui.press({ key: 'handoff-other' })
-  expect(sent.length).toBe(1)
-  expect(String(sent[0]?.text)).toMatch(/context-handoff/)
+  expect(filled[0]).toMatch(/^Ask session "claude-setup · \d\d:\d\d" \(other\) to run \/context-handoff and show me the handoff text\.$/)
   await ui.press({ key: 'handoff-me' })
-  expect(filled).toEqual(['/context-handoff'])
-  expect(sent.length).toBe(1)
+  expect(filled[1]).toBe('/context-handoff')
+  expect(sends).toBe(0)
+  await ui.unmount()
+})
+
+test('pane: Hand off names the desktop id and title when the status file has them', async ($, on) => {
+  const filled: string[] = []
+  on('prompt.fill', (_: any, e: any) => {
+    filled.push(e.text)
+    return { isFilled: true } as any
+  })
+  on('ui.toast', () => ({ value: undefined }))
+  const ui = await mountWarm($, on, [['other.json', 200_000, 5, 'other']], {
+    title: 'Total tokens consumed',
+    appId: 'local_6a6bc6cc-17f4-4f36-91bf-3b5050617aad',
+  })
+  await ui.press({ key: 'handoff-other' })
+  expect(filled[0]).toContain('"Total tokens consumed" (local_6a6bc6cc-17f4-4f36-91bf-3b5050617aad)')
   await ui.unmount()
 })
