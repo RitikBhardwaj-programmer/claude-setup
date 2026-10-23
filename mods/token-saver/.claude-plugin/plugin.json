@@ -1,0 +1,32 @@
+{
+  "name": "token-saver",
+  "version": "0.1.0",
+  "description": "Saves tokens: 200k handoff warning, /warm pane of warm-cache sessions, smaller Browser screenshots, Explore nudge, deferred Browser tools",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "warnTokens": {
+      "type": "number",
+      "title": "Handoff warning (tokens)",
+      "description": "Warn when the context reaches this many tokens, then again every 100k.",
+      "default": 200000
+    },
+    "exploreAfter": {
+      "type": "number",
+      "title": "Explore nudge (calls per turn)",
+      "description": "After this many Read, Grep and Glob calls in one turn, suggest an Explore subagent.",
+      "default": 8
+    },
+    "shrinkScreenshots": {
+      "type": "boolean",
+      "title": "Shrink Browser screenshots",
+      "description": "Add scale 0.5 to Browser-pane screenshots and zooms that set no scale (off during visual design work).",
+      "default": true
+    },
+    "deferBrowserTools": {
+      "type": "boolean",
+      "title": "Defer Browser-pane tools",
+      "description": "List the Browser-pane tools behind ToolSearch. Takes effect in new sessions.",
+      "default": true
+    }
+  }
+}

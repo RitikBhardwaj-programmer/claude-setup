@@ -12,7 +12,10 @@ DEST = Path.home() / ".claude"
 PERSONAL = REPO / "personal"
 IGNORE = {"__pycache__", ".DS_Store"}
 # Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
-PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official"]
+PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official",
+           "token-saver@claude-setup"]
+# Marketplaces that are not built in: this repo itself (token-saver lives in mods/). Name -> folder to add.
+LOCAL_MARKETPLACES = {"claude-setup": REPO}
 # Agent bridge: other apps that read the shared skills and rules. Each target is only touched when its app folder exists.
 HOME = Path.home()
 CODEX_AGENTS = HOME / ".codex" / "AGENTS.md"

@@ -6,7 +6,7 @@ set -euo pipefail
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST="$HOME/.claude"
 SKILLS="context-handoff context-handoff-deep graphify llm-council explain report-publisher vendor-requirements-spec improve-setup intuition youtube-transcript route ui-design"
-PLUGINS="frontend-design@claude-plugins-official claude-security@claude-plugins-official"  # keep in sync with PLUGINS in scripts/setup_lib.py
+PLUGINS="frontend-design@claude-plugins-official claude-security@claude-plugins-official token-saver@claude-setup"  # keep in sync with PLUGINS in scripts/setup_lib.py
 BACKUP="$DEST/backups/pre-shared-setup-$(date +%Y%m%d-%H%M%S)"
 
 mkdir -p "$DEST/skills" "$DEST/agents"
@@ -44,6 +44,10 @@ done
 cp "$SRC"/agents/*.md "$DEST/agents/"
 plugin_note=""
 if command -v claude >/dev/null 2>&1; then
+  # token-saver comes from this repo, used as a local marketplace named claude-setup
+  if ! claude plugin marketplace list 2>/dev/null | grep -q "❯ claude-setup$"; then
+    claude plugin marketplace add "$SRC" || plugin_note="$plugin_note marketplace:$SRC"
+  fi
   for p in $PLUGINS; do
     if ! claude plugin list --json 2>/dev/null | grep -q "$p"; then
       claude plugin install "$p" || plugin_note="$plugin_note $p"

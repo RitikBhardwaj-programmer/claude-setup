@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
-                       HOME, IGNORE, PERSONAL, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
+                       HOME, IGNORE, LOCAL_MARKETPLACES, PERSONAL, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
                        read_json_file, skill_overrides_block, skill_sources, want_mcp_json, writer_task_action,
                        writer_task_drift)
@@ -83,6 +83,21 @@ def main():
     if have is None:
         print("NOTE: `claude` CLI not found; install these plugins by hand: " +
               ", ".join(f"claude plugin install {p}" for p in PLUGINS))
+    if have is not None:
+        try:
+            listed = subprocess.run([shutil.which("claude"), "plugin", "marketplace", "list"], capture_output=True,
+                                    text=True, encoding="utf-8", timeout=60).stdout
+        except (OSError, subprocess.SubprocessError):
+            listed = ""
+        for name, folder in LOCAL_MARKETPLACES.items():
+            if f"❯ {name}\n" in listed.replace("\r\n", "\n"):
+                continue
+            actions.append(f"marketplace {name}")
+            if not a.dry_run:
+                r = subprocess.run([shutil.which("claude"), "plugin", "marketplace", "add", str(folder)],
+                                   capture_output=True, text=True, encoding="utf-8")
+                if r.returncode != 0:
+                    print(f"WARNING: marketplace add failed for {name}: {(r.stderr or r.stdout).strip()}")
     for p in PLUGINS:
         if have is None or p in have:
             continue

@@ -23,9 +23,10 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 
 - **1 helper agent** (a second Claude with its own fresh memory that does one job and reports back):
   - **design-review**: checks a finished screen like a senior designer would (flows, three screen sizes, polish, accessibility, error and empty states) and lists problems from "Blocker" to "Nit". It only reports; it never changes your code. Adapted from [OneRedOak/claude-code-workflows](https://github.com/OneRedOak/claude-code-workflows) (MIT licence).
-- **2 plugins** (a ready-made add-on from Anthropic's official plugin store):
+- **3 plugins** (a ready-made add-on; two from Anthropic's official plugin store, one from this repo):
   - **frontend-design**: Anthropic's own design skill that pushes Claude towards bold, distinctive designs instead of the average look. The installer adds it for you with `claude plugin install`.
   - **claude-security**: Anthropic's multi-agent vulnerability scanner. Run `/claude-security` in a repo to scan it and get a report (and optional patch files you apply yourself).
+  - **token-saver** (a mod in `mods/token-saver/`): saves tokens by itself. It warns at 200k context, shows sessions with a still-warm prompt cache (`/warm`), shrinks Browser-pane screenshots (not during visual design; `/token-saver visual on|off`), nudges toward an Explore subagent, and lists the Browser tools behind ToolSearch. Installed from this repo as the local marketplace `claude-setup`. Takes effect in new sessions.
 
 Nothing private is in the parts the Mac installer uses: no passwords, no login keys, no project notes. The `personal/` folder is my own Windows PC's configuration; the Mac installer never touches it.
 
@@ -94,7 +95,8 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 |---|---|---|
 | `CLAUDE.md`, `skills/` | Shared rulebook and portable skills | Mac and Windows |
 | `agents/` | Shared subagents (design-review), copied to `~/.claude/agents/` | Mac and Windows |
-| `PLUGINS` in `scripts/setup_lib.py` and `install.sh` | Marketplace plugins the installers add with `claude plugin install` (frontend-design, claude-security); keep both lists the same | Mac and Windows |
+| `PLUGINS` in `scripts/setup_lib.py` and `install.sh` | Marketplace plugins the installers add with `claude plugin install` (frontend-design, claude-security, token-saver); keep both lists the same | Mac and Windows |
+| `mods/token-saver/`, `.claude-plugin/marketplace.json` | The token-saver mod, and this repo as a local marketplace (`claude-setup`) that lists it | Mac and Windows |
 | `personal/CLAUDE.personal.md` | My personal rules (explanation style, Windows shell, Brain vault, this workflow), appended to `CLAUDE.md` | Windows only |
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
 | `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, retro nudge, handoff reminder) and their registration | Windows only |
