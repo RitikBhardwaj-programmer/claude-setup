@@ -76,6 +76,7 @@ For design, planning or research tasks, put the hard constraints in the first ba
 - Use only the project's stack and approved libraries. Adding a dependency requires approval.
 - Follow existing naming, structure, error-handling, and style patterns in the surrounding code.
 - Change only what the task requires: no drive-by refactors, reformatting of untouched code, or renames outside the task.
+- Open a file you will change with the Read tool, not `cat`/`sed` in a shell: Edit and Write refuse files the Read tool has not seen.
 - Preserve existing behavior and public interfaces unless the task says otherwise.
 - Handle errors and the edge cases listed in the spec: empty states, invalid input, failures.
 - Security by default: parameterized queries, validated input, no secrets in code, no disabled auth checks.
@@ -138,6 +139,7 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - Don't load large or generated files (lockfiles, build output, `node_modules`, virtualenvs, data dumps). Respect `.claudeignore`.
 - Delegate exploration and independent parallel work to subagents, and bring back summaries rather than raw output.
 - Aim for one feature per session. At a natural breakpoint, when context is heavy (~70%), suggest `/compact` or a fresh session. Never compact mid-change.
+- A proposed session card (`own_initiative`) cannot carry a `cwd`, host or preset. For follow-up work in another folder, ask in the wrap-up; on a yes, start it with `user_asked` and the `cwd`.
 - Re-read source when unsure instead of trusting memory from earlier in the session.
 - Persist important decisions in specs, plans, or CLAUDE.md, not only in chat.
 

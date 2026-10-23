@@ -44,7 +44,7 @@ Never finish a UI task without looking at it.
 1. **Run it.** In the Claude desktop app, add the dev server to `.claude/launch.json` and open it with `preview_start`; the Browser pane then shows each change. Otherwise use Claude in Chrome or Playwright MCP.
 2. **Look at three widths:** 1440, 768 and 375 px (mobile: 375×812). Resize first; a hidden pane reports width 0.
 3. **Compare and list.** Screenshot, then compare against the mock, the screenshot the user gave, or the design plan. Write the differences as a list before fixing anything.
-4. **Fix and look again** until the list is empty. If screenshots fail, check with page JavaScript: horizontal overflow (`scrollWidth > innerWidth`), overlapping elements, broken images, console errors.
+4. **Fix and look again** until the list is empty. If screenshots fail, check with page JavaScript: horizontal overflow (`scrollWidth > innerWidth`), overlapping elements, broken images, console errors. A screenshot or script that times out usually means the pane is hidden or the window is behind another one: retry once, then read the page with `read_page`/`get_page_text`, and if that also times out, ask the user to bring the Claude window to the front. Do not loop retries.
 5. **Mobile apps:** use the device screenshot tool you have (Expo MCP, an Android emulator, iOS simulator tools on macOS). On Windows without these, check the web build at 375×812.
 
 ## 4. Review before you say done
