@@ -96,7 +96,7 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 | `CLAUDE.md`, `skills/` | Shared rulebook and portable skills | Mac and Windows |
 | `agents/` | Shared subagents (design-review), copied to `~/.claude/agents/` | Mac and Windows |
 | `PLUGINS` in `scripts/setup_lib.py` and `install.sh` | Marketplace plugins the installers add with `claude plugin install` (frontend-design, claude-security, token-saver); keep both lists the same | Mac and Windows |
-| `mods/token-saver/`, `.claude-plugin/marketplace.json` | The token-saver mod, and this repo as a local marketplace (`claude-setup`) that lists it | Mac and Windows |
+| `mods/token-saver/`, `.claude-plugin/marketplace.json` | The token-saver mod (bump `version` in its plugin.json with every edit, or the installed copy stays old; `check_drift.py` flags it), and this repo as a local marketplace (`claude-setup`) that lists it | Mac and Windows |
 | `personal/CLAUDE.personal.md` | My personal rules (explanation style, Windows shell, Brain vault, this workflow), appended to `CLAUDE.md` | Windows only |
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
 | `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, retro nudge, handoff reminder) and their registration | Windows only |

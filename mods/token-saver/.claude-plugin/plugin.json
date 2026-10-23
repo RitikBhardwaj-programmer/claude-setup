@@ -1,6 +1,6 @@
 {
   "name": "token-saver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Saves tokens: 200k handoff warning, /warm pane of warm-cache sessions, smaller Browser screenshots, Explore nudge, deferred Browser tools",
   "types": "./types/index.d.ts",
   "userConfig": {

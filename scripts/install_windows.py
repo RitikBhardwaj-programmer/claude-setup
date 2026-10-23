@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
-                       HOME, IGNORE, LOCAL_MARKETPLACES, PERSONAL, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
+                       HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
                        read_json_file, skill_overrides_block, skill_sources, want_mcp_json, writer_task_action,
                        writer_task_drift)
@@ -107,6 +107,20 @@ def main():
                                encoding="utf-8")
             if r.returncode != 0:
                 print(f"WARNING: plugin install failed for {p}: {(r.stderr or r.stdout).strip()}")
+
+    # Repo plugins already installed: refresh the cached copy when it differs from the repo.
+    if have is not None and local_plugin_drift():
+        claude = shutil.which("claude")
+        subprocess.run([claude, "plugin", "marketplace", "update"], capture_output=True, text=True, encoding="utf-8")
+        for pid in LOCAL_PLUGIN_DIRS:
+            actions.append(f"plugin update {pid}")
+            if not a.dry_run:
+                r = subprocess.run([claude, "plugin", "update", pid], capture_output=True, text=True, encoding="utf-8")
+                if r.returncode != 0:
+                    print(f"WARNING: plugin update failed for {pid}: {(r.stderr or r.stdout).strip()}")
+        if not a.dry_run and local_plugin_drift():
+            print("WARNING: the installed token-saver copy still differs from the repo. "
+                  "Bump `version` in mods/token-saver/.claude-plugin/plugin.json and run the installer again.")
 
     if personal:
         # 3. Hooks
