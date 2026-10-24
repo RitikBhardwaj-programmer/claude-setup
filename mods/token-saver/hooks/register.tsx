@@ -27,6 +27,22 @@ export const withScale = (input: Record<string, unknown>): Record<string, unknow
     ? { ...input, scale: 0.5 }
     : input
 
+// True when a Bash command reads files or lists them: its first command word (after leading `cd <dir> &&`
+// and VAR=value parts) is cat, head, tail, grep, rg, ls, find, or sed with -n. Only the first command of a
+// pipeline counts, so `cat x | head` is one read and `npm test | grep x` is none.
+export const isBashRead = (command: string): boolean => {
+  let rest = command.trim()
+  for (;;) {
+    const next = rest.replace(/^cd\s+(?:"[^"]*"|'[^']*'|\S+)\s*(?:&&|;)\s*/, '').replace(/^[A-Za-z_]\w*=\S*\s+/, '')
+    if (next === rest) break
+    rest = next
+  }
+  const first = rest.split(/\|(?!\|)|&&|;/)[0]?.trim().split(/\s+/) ?? []
+  const word = first[0]?.replace(/^.*[\\/]/, '') ?? ''
+  if (word === 'sed') return first.includes('-n')
+  return ['cat', 'head', 'tail', 'grep', 'rg', 'ls', 'find'].includes(word)
+}
+
 const k = (n: number) => `${Math.round(n / 1000)}k`
 
 // Which advice group a session falls in, by context size.
@@ -327,9 +343,10 @@ export const register: Register = (on, options) => {
     return next(e)
   }).catch(($, e, next) => next(e))
 
-  for (const tool of ['Read', 'Grep', 'Glob'] as const) {
+  for (const tool of ['Read', 'Grep', 'Glob', 'Bash'] as const) {
     on('tool.call', { tool: tool as 'Read' }, async ($, e, next) => {
       if ((e as { agentId?: string }).agentId) return next(e)
+      if (tool === 'Bash' && !isBashRead(String((e as { command?: string }).command ?? ''))) return next(e)
       reads += 1
       const ran = await next(e)
       if (reads < exploreAfter || hasNudged || ran.deny !== undefined) return ran

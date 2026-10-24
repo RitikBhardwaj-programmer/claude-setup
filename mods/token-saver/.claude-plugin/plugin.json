@@ -1,6 +1,6 @@
 {
   "name": "token-saver",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Saves tokens: 200k handoff warning, /warm pane of warm-cache sessions, smaller Browser screenshots, Explore nudge, deferred Browser tools",
   "types": "./types/index.d.ts",
   "userConfig": {
@@ -13,7 +13,7 @@
     "exploreAfter": {
       "type": "number",
       "title": "Explore nudge (calls per turn)",
-      "description": "After this many Read, Grep and Glob calls in one turn, suggest an Explore subagent.",
+      "description": "After this many Read, Grep, Glob and Bash file-read calls (cat, sed -n, head, tail, grep, rg, ls, find) in one turn, suggest an Explore subagent.",
       "default": 8
     },
     "shrinkScreenshots": {
