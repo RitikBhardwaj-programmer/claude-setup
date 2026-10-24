@@ -1,4 +1,5 @@
 import { expect, test } from 'claude-code/testing'
+import { isBashRead } from './register'
 
 const usage = (tokens: number) => ({
   context: { tokens, window: 1_000_000 },
@@ -281,4 +282,30 @@ test('pane: Hand off names the desktop id and title when the status file has the
   await ui.press({ key: 'handoff-other' })
   expect(filled[0]).toContain('"Total tokens consumed" (local_6a6bc6cc-17f4-4f36-91bf-3b5050617aad)')
   await ui.unmount()
+})
+
+test('D: isBashRead tells file reads from other commands', () => {
+  for (const c of ['cat a.py', 'sed -n 1,50p f', 'cd /x && grep -n foo f', 'FOO=1 head f', 'ls -la', 'find . -name x', 'rg foo', 'tail -5 log', 'cat x | head']) {
+    expect([c, isBashRead(c)]).toEqual([c, true])
+  }
+  for (const c of ['sed -i s/a/b/ f', 'npm test | grep x', 'git status', 'py -3 x.py', '']) {
+    expect([c, isBashRead(c)]).toEqual([c, false])
+  }
+})
+
+test('D: 8 mixed Read and Bash-read calls in one turn nudge exactly once', async ($, on) => {
+  on('tool.call', () => ({ result: {} }))
+  const calls = [
+    { tool: 'Read', file_path: '/a' }, { tool: 'Bash', command: 'cat b' }, { tool: 'Bash', command: 'git status' },
+    { tool: 'Bash', command: 'sed -n 1,5p c' }, { tool: 'Read', file_path: '/d' }, { tool: 'Bash', command: 'ls' },
+    { tool: 'Bash', command: 'rg x' }, { tool: 'Read', file_path: '/e' }, { tool: 'Bash', command: 'tail f' },
+    { tool: 'Read', file_path: '/g' },
+  ] as const
+  const notes: number[] = []
+  for (const [i, c] of calls.entries()) {
+    const ran = await $.tool.call(c as any)
+    if ('context' in ran && ran.context?.length) notes.push(i)
+  }
+  // git status is not a read, so the 8th counted call is index 8 (tail f).
+  expect(notes).toEqual([8])
 })
