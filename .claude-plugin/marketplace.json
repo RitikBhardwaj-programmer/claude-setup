@@ -1,0 +1,11 @@
+{
+  "name": "claude-setup",
+  "owner": { "name": "RitikBhardwaj-programmer" },
+  "plugins": [
+    {
+      "name": "token-saver",
+      "source": "./mods/token-saver",
+      "description": "Warns at 200k context, shows warm-cache sessions, shrinks screenshots, nudges Explore, defers Browser tools"
+    }
+  ]
+}

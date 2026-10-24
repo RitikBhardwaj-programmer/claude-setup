@@ -12,7 +12,13 @@ DEST = Path.home() / ".claude"
 PERSONAL = REPO / "personal"
 IGNORE = {"__pycache__", ".DS_Store"}
 # Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
-PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official"]
+PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official",
+           "token-saver@claude-setup"]
+# Marketplaces that are not built in: this repo itself (token-saver lives in mods/). Name -> folder to add.
+LOCAL_MARKETPLACES = {"claude-setup": REPO}
+# Plugins that live in this repo: id -> source folder. The installed copy (a cache) must match it.
+# Claude Code refreshes that cache only when plugin.json `version` changes, so bump it with every mod edit.
+LOCAL_PLUGIN_DIRS = {"token-saver@claude-setup": REPO / "mods" / "token-saver"}
 # Agent bridge: other apps that read the shared skills and rules. Each target is only touched when its app folder exists.
 HOME = Path.home()
 CODEX_AGENTS = HOME / ".codex" / "AGENTS.md"
@@ -85,6 +91,30 @@ def installed_plugins():
     return ids
 
 
+def installed_plugin_path(plugin_id: str):
+    """Folder Claude Code runs the plugin from (installPath in installed_plugins.json), or None."""
+    try:
+        data = json.loads((DEST / "plugins" / "installed_plugins.json").read_text(encoding="utf-8"))
+        entries = data.get("plugins", {}).get(plugin_id) or []
+        return Path(entries[0]["installPath"]) if entries else None
+    except (OSError, ValueError, KeyError, IndexError):
+        return None
+
+
+def local_plugin_drift():
+    """Findings for repo plugins whose installed copy differs from the repo folder."""
+    found = []
+    for pid, src in LOCAL_PLUGIN_DIRS.items():
+        dst = installed_plugin_path(pid)
+        if dst is None:
+            continue  # not installed: the plugins check reports that
+        for d in tree_diff(src, dst):
+            if d.startswith(".claude-plugin/types"):
+                continue  # written by the engine, not part of the repo
+            found.append(f"plugin {pid}: installed copy differs from the repo: {d}")
+    return found
+
+
 def hook_sources():
     d = PERSONAL / "hooks"
     return sorted(p for p in d.glob("*.py")) if d.is_dir() else []
@@ -155,6 +185,7 @@ def drift(with_personal: bool):
         for p in PLUGINS:
             if p not in have:
                 found.append(f"plugins: {p} is not installed")
+        found += local_plugin_drift()
     if with_personal:
         for h in hook_sources():
             live = DEST / "hooks" / h.name
