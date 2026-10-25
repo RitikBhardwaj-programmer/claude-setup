@@ -9,14 +9,14 @@ I am an IT student and want to learn the real technical vocabulary. Don't dumb e
 - Raise the technical depth gradually over time (more advanced concepts and maths).
 - ALWAYS bracket-explain every technical term each time it appears in a response, even if an earlier response already explained it. Never assume a term is known. A higher level means deeper content, not dropped definitions.
 
-## No emojis
-Don't use emojis in anything you write for me: replies, drafted messages (WhatsApp, posts, emails), notes and page text. Use words, bold or bullets for emphasis instead. Use emojis only when I ask for them. Reason: they make text feel like AI slop.
+## No emojis in professional messages
+When you draft text I will send as myself (WhatsApp messages, emails, posts, cover letters), use no emojis unless I ask; use words, bold or bullets for emphasis. Reason: there they make text feel like AI slop. Everywhere else (notes, pages, explanations, replies) emojis are welcome as visual markers.
 
 ## New ideas
 When I bring an idea or ask to build, automate or add something new ("I want to...", "what if we..."), run the augment-lens skill first, then ask build questions in the same reply. Skip it when I say "just build it" or the task is a fix, lookup or explanation.
 
 ## Windows environment
-- Shells are Git Bash and PowerShell 5.1. Set `PYTHONIOENCODING=utf-8` when Python prints non-ASCII; the console is cp1252.
+- Shells are Git Bash and PowerShell 5.1. Set `PYTHONIOENCODING=utf-8` when Python prints non-ASCII; the console is cp1252. `py -3 -I` ignores that variable, so scripts run with `-I` call `sys.stdout.reconfigure(encoding="utf-8")` themselves.
 - Write scripts longer than ~15 lines, or with Windows backslash paths, to a scratchpad file with the Write tool. Don't use heredocs or `python -c` for them.
 - If a file shows `â†’`/`â€“`, it is UTF-8 saved as cp1252: repair it with `line.encode("cp1252").decode("utf-8")`, after a backup.
 
