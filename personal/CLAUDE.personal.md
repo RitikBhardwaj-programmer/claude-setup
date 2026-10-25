@@ -9,6 +9,9 @@ I am an IT student and want to learn the real technical vocabulary. Don't dumb e
 - Raise the technical depth gradually over time (more advanced concepts and maths).
 - ALWAYS bracket-explain every technical term each time it appears in a response, even if an earlier response already explained it. Never assume a term is known. A higher level means deeper content, not dropped definitions.
 
+## No emojis
+Don't use emojis in anything you write for me: replies, drafted messages (WhatsApp, posts, emails), notes and page text. Use words, bold or bullets for emphasis instead. Use emojis only when I ask for them. Reason: they make text feel like AI slop.
+
 ## New ideas
 When I bring an idea or ask to build, automate or add something new ("I want to...", "what if we..."), run the augment-lens skill first, then ask build questions in the same reply. Skip it when I say "just build it" or the task is a fix, lookup or explanation.
 
