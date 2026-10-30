@@ -3,7 +3,7 @@
 This is my setup for **Claude Code** (the version of Claude that can work with files and code on your computer). It contains:
 
 - **`CLAUDE.md`**: my rulebook. Claude reads it at the start of every conversation and follows it, a bit like a job contract for an assistant. It makes Claude plan first, avoid guessing, test its work and never delete your stuff without asking.
-- **13 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
+- **15 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
 
 | Skill | What it does | How to use it |
 |---|---|---|
@@ -20,6 +20,8 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 | **agent-handoff** | Passes work between Claude Code, Antigravity and Codex through a short brief file in the project (`.handoff/`). You switch apps by hand and paste one line; the skill writes the brief, checks it against git, locks the files so only one agent writes at a time, and writes the result back | say "hand this to Antigravity" or paste the line it gives you |
 | **route** | Before a bigger job starts, picks which Claude model and how much "thinking effort" each part of the job gets (strong model to plan, cheaper one to build, cheapest to search), so your usage limit lasts longer. It can also hand self-contained parts to Codex if you have it | it runs by itself in plans, or type `/route` |
 | **ui-design** | When Claude builds or restyles a web page, dashboard or app screen, it follows clear design rules (no generic "AI look", real colours and fonts from your project, accessibility), then looks at its own result in a browser at desktop, tablet and phone size and fixes what it sees | it runs by itself on UI work, or type `/ui-design` |
+| **dimensional-drawing** | Turns a UI component (card, button, dialog) into a one-page black-and-white technical drawing, like Apple's accessory spec sheets: paddings, gaps, corner radii and layers, each as a named variable. It measures the real code in a browser; anything it can't measure is marked `[TBD]`, never guessed. From [enesozturk/dimensional-drawing](https://github.com/enesozturk/dimensional-drawing) (MIT licence) | say "make a dimensional drawing of the Card component" |
+| **dimensional-drawing-motion** | Turns a finished drawing into a ~10 second film of a pen drawing the sheet. Best in Claude's Motion artifact; without it, it needs Node 18+, ffmpeg and Playwright | say "animate the drawing" |
 
 - **1 helper agent** (a second Claude with its own fresh memory that does one job and reports back):
   - **design-review**: checks a finished screen like a senior designer would (flows, three screen sizes, polish, accessibility, error and empty states) and lists problems from "Blocker" to "Nit". It only reports; it never changes your code. Adapted from [OneRedOak/claude-code-workflows](https://github.com/OneRedOak/claude-code-workflows) (MIT licence).
