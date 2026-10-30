@@ -5,7 +5,7 @@ description: "Write a routing card (which model, effort and agent does each phas
 
 # Route
 
-Paid tokens are limited. The bill is roughly **context size × number of turns × price per token ÷ chance of first-try success**. So the two biggest levers are a small context and few retries. Model price comes after those. This skill picks a model and effort **per phase** and keeps big contexts out of expensive sessions.
+Paid tokens are limited. The bill is roughly **context size × number of turns × price per token ÷ chance of first-try success**. So the two biggest levers are a small context and few retries. Model price comes after those. On a subscription plan (Pro, Max) the same formula decides how fast the 5-hour and weekly usage limits run out. This skill picks a model and effort **per phase** and keeps big contexts out of expensive sessions.
 
 Model scores and prices: `references/models.md`. Read it each time you write a card.
 
@@ -29,7 +29,9 @@ Defaults (adjust them with `references/models.md`):
 Rules:
 - **Raise the model when failure is quiet.** If a wrong answer would look right (design, concurrency, auth, maths), use the stronger model. If a failure is loud (a test fails at once), use the cheaper one.
 - **Effort is a separate dial.** High effort on a rename wastes thinking tokens. Low effort on a plan makes a shallow plan, and every later phase pays for it.
-- **Switch at phase borders only.** Prompt caching (the provider stores the repeated context so re-reading it costs less) is per model. After a model switch, the next turn re-reads the whole context uncached. A fresh session for the build phase avoids this, and it also starts with a small context.
+- **Switch at phase borders only.** Prompt caching (the provider stores the repeated context so re-reading it costs less) is per model. After a model switch, the next turn re-reads the whole context uncached. On Opus and Sonnet 5.5 a cache hit costs 0.05× the input price, so that uncached re-read costs ~20× more. A fresh session for the build phase avoids this, and it also starts with a small context.
+- **Keep a Haiku subagent's prompt under 100K tokens.** Haiku 5.5 costs 5× more per token above 100K. For a bigger read, split it across several Haiku subagents, each with its own part.
+- **Never run Sonnet at max effort.** Opus at max costs the same per task and scores higher. If a phase needs max effort, use Opus.
 - **Check this session's own model first.** "Main session" means this session at its current price. If this session runs a stronger model or effort than a phase needs (for example opus high for a sonnet build), give that phase to a new session or a subagent, not "main session".
 - **Do not use a model that is dominated** (another model scores higher and costs less per task). See `references/models.md`.
 
