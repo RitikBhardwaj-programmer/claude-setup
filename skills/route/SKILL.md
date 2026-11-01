@@ -78,7 +78,7 @@ Keep the card to 3–6 rows. The user approves it together with the plan.
 
 The approval of the card is the user's instruction to act on it. Do not ask again.
 - **Subagents:** pass `model` and `effort` on each Agent call, as the card says.
-- **Build in a new session:** use `start_session` with `initiation: "user_asked"`, `context: "fresh"`, the card's `model` and `effort`, and the approved plan as the brief (goal, files, steps, verification). That session can only use a model and effort the same as or cheaper than this one.
+- **Build in a new session:** use `start_session` with `initiation: "user_asked"`, `context: "fresh"`, the card's `model` and `effort`, and the approved plan as the brief (goal, files, steps, verification). That session can only use a model and effort the same as or cheaper than this one. For a cloud session, run `git remote -v` first: it needs a github.com origin, or the start fails with "cannot clone this project".
 - **This session's own model:** the session tools refuse to change it (a session must not re-price its own turns). If a phase needs a **stronger** model than the current one, tell the user in one line to pick it in the model menu (CLI: `/model`, `/effort`) before that phase.
 - **Codex:** after the user approves the handoff in the card, run `codex exec`.
 - **Antigravity:** after the user approves the handoff in the card, run `agent-handoff` in mode `out` (watcher or paste line, then a background wait for the return). Do not run `agy`.

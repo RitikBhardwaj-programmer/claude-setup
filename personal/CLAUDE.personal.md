@@ -17,7 +17,7 @@ When I bring an idea or ask to build, automate or add something new ("I want to.
 
 ## Windows environment
 - Shells are Git Bash and PowerShell 5.1. Set `PYTHONIOENCODING=utf-8` when Python prints non-ASCII; the console is cp1252. `py -3 -I` ignores that variable, so scripts run with `-I` call `sys.stdout.reconfigure(encoding="utf-8")` themselves.
-- Write scripts longer than ~15 lines, or with Windows backslash paths, to a scratchpad file with the Write tool. Don't use heredocs or `python -c` for them.
+- Write scripts longer than ~15 lines, or with Windows backslash paths, to a scratchpad file with the Write tool. Don't use heredocs or `python -c` for them. The same goes for multi-line `sh -c` strings passed from PowerShell to docker: put the script in a file and mount or copy it.
 - To read a PDF, follow the pdf-router hook's Marker command (marker venv Python). Bare `py -3` has no `fitz`/PyMuPDF.
 - If a file shows `â†’`/`â€“`, it is UTF-8 saved as cp1252: repair it with `line.encode("cp1252").decode("utf-8")`, after a backup.
 
