@@ -18,6 +18,7 @@ When I bring an idea or ask to build, automate or add something new ("I want to.
 ## Windows environment
 - Shells are Git Bash and PowerShell 5.1. Set `PYTHONIOENCODING=utf-8` when Python prints non-ASCII; the console is cp1252. `py -3 -I` ignores that variable, so scripts run with `-I` call `sys.stdout.reconfigure(encoding="utf-8")` themselves.
 - Write scripts longer than ~15 lines, or with Windows backslash paths, to a scratchpad file with the Write tool. Don't use heredocs or `python -c` for them.
+- To read a PDF, follow the pdf-router hook's Marker command (marker venv Python). Bare `py -3` has no `fitz`/PyMuPDF.
 - If a file shows `â†’`/`â€“`, it is UTF-8 saved as cp1252: repair it with `line.encode("cp1252").decode("utf-8")`, after a backup.
 
 ## Knowledge base (Brain vault)
@@ -28,8 +29,7 @@ My long-term notes are in `C:\Users\DELL\Brain` (a junction to `C:\Users\DELL\On
 
 ## Student Developer Pack tools
 I have GitHub Student Developer Pack benefits. The list of claimed and still-unclaimed tools is in the vault note `Projects/Student Developer Pack/Overview.md`.
-- When a project needs hosting, a database, ML compute, monitoring, secrets or similar, read that note and prefer those tools before paid or new services.
-- If a task needs any tool, account, API key or paid tier not marked as claimed there, tell me first and say why. For an unclaimed Pack credit, say so before I claim it, because its clock starts on claim.
+- When a project needs hosting, a database, ML compute, monitoring, secrets or similar, read that note and prefer those tools before paid or new services. If a task needs any tool, account, API key or paid tier not marked as claimed there, tell me first and say why. For an unclaimed Pack credit, say so before I claim it, because its clock starts on claim.
 
 ## Claude setup repo
 My Claude Code setup (CLAUDE.md, skills, hooks, hook settings) is managed in the git repo `C:\Users\DELL\claude-setup`; it is the source of truth.

@@ -39,10 +39,9 @@ Every medium or large task gets a routing card (`route` skill) before implementa
 Explore in this order, stopping once you know enough:
 1. High-signal files: README, CLAUDE.md files, manifest (`package.json`, `requirements.txt`, `pyproject.toml`, etc.), config, entry points.
 2. Directory tree: stack, layout, naming conventions, where each kind of code belongs.
-3. Targeted search (grep/glob) for the feature's keywords, symbols, routes, and tables.
-4. Trace data flow: entry point → handler → logic → data layer → response/UI.
-5. Existing tests for the area: they show expected behavior and test conventions.
-6. Before writing any helper, component, query, or style, check whether one already exists and reuse or extend it.
+3. Targeted search (grep/glob) for the feature's keywords, symbols, routes, and tables; then trace data flow: entry point → handler → logic → data layer → response/UI.
+4. Existing tests for the area: they show expected behavior and test conventions.
+5. Before writing any helper, component, query, or style, check whether one already exists and reuse or extend it.
 
 For broad exploration, use an Explore subagent (read-only) and keep only its summary in the main context. Run independent investigations in parallel subagents.
 
@@ -50,12 +49,9 @@ For broad exploration, use an Explore subagent (read-only) and keep only its sum
 For medium and large tasks, plan in read-only mode first (Plan Mode); make no edits until the plan is approved. Save non-trivial plans to `.claude/plans/<feature>.md` when the project uses that folder.
 
 Plan contents, scaled to the task:
-- **Goal:** the problem in 1–3 sentences, with the spec reference if any.
-- **Files:** which files change or get created, and why.
-- **Changes:** the order of steps (typically data/models → backend → frontend → integration).
-- **Reuse:** existing code to build on.
-- **Risks:** breaking changes, migrations, security, edge cases.
-- **Verification:** tests to write or run, commands, manual checks, mapped to acceptance criteria.
+- **Goal** (1–3 sentences, with the spec reference if any); **Files** that change or get created, and why.
+- **Changes:** the order of steps (typically data/models → backend → frontend → integration); **Reuse:** existing code to build on.
+- **Risks:** breaking changes, migrations, security, edge cases; **Verification:** tests, commands, manual checks, mapped to acceptance criteria.
 - **Assumptions and open questions.**
 - **Routing card:** run the `route` skill and add its card (model, effort and agent per phase, plus Codex handoffs). After approval, carry it out.
 
@@ -77,21 +73,18 @@ For design, planning or research tasks, put the hard constraints in the first ba
 - Follow existing naming, structure, error-handling, and style patterns in the surrounding code.
 - Change only what the task requires: no drive-by refactors, reformatting of untouched code, or renames outside the task.
 - Open a file you will change with the Read tool, not `cat`/`sed` in a shell: Edit and Write refuse files the Read tool has not seen.
-- Preserve existing behavior and public interfaces unless the task says otherwise.
-- Handle errors and the edge cases listed in the spec: empty states, invalid input, failures.
+- Preserve existing behavior and public interfaces unless the task says otherwise. Handle errors and the edge cases listed in the spec: empty states, invalid input, failures.
 - Security by default: parameterized queries, validated input, no secrets in code, no disabled auth checks.
-- Keep functions small and focused. Prefer the simplest design that meets the requirements.
-- For large tasks, work in stages and get each stage working before starting the next.
+- Keep functions small and focused. Prefer the simplest design that meets the requirements. For large tasks, work in stages and get each stage working before starting the next.
 - UI from a design image: match the design and the existing theme, and change only the targeted section.
 - When data lacks labels or IDs, extend my existing naming pattern, confirm it once, and state it in the output. Don't invent a new scheme.
 
 ## Testing & Verification
 Verify in this order and stop when confidence is adequate for the task size:
-1. Targeted tests for the changed code.
-2. Related unit and integration tests.
-3. Build, type check, lint, and the project's formatter on changed files.
-4. The broader suite, for medium or large changes.
-5. Manual check: start the app, exercise the feature, inspect the resulting data.
+1. Targeted tests for the changed code, then related unit and integration tests.
+2. Build, type check, lint, and the project's formatter on changed files.
+3. The broader suite, for medium or large changes.
+4. Manual check: start the app, exercise the feature, inspect the resulting data.
 
 Rules:
 - Derive tests from the spec and acceptance criteria, not from the code you just wrote.
@@ -102,8 +95,7 @@ Rules:
 
 ## Debugging
 Observe → reproduce → inspect → hypothesize → test the hypothesis → fix the root cause → verify.
-- Read the full error or stack trace and the code it points to before editing anything.
-- Change one thing at a time. Don't stack speculative fixes.
+- Read the full error or stack trace and the code it points to before editing anything. Change one thing at a time; don't stack speculative fixes.
 - Check recent changes (`git diff`, `git log`) as likely causes.
 - After two failed attempts, stop, summarize what you've learned, and propose options instead of guessing further.
 - If the spec itself looks wrong, flag it rather than coding around it.
@@ -114,9 +106,7 @@ Before declaring done, read your own full diff (`git diff`) and check:
 - **Correctness:** edge cases, error handling, and no broken callers.
 - **Security:** injection, authentication/authorization, secrets, input validation.
 - **Scope:** no unrelated edits, debug leftovers, dead code, or duplicate utilities.
-- **Quality:** consistent with project conventions, readable, not over-engineered.
-- **Performance** where it matters, e.g. N+1 queries or unbounded loops.
-- **Tests and docs** updated.
+- **Quality:** consistent with project conventions, readable, not over-engineered. **Performance** where it matters (N+1 queries, unbounded loops). **Tests and docs** updated.
 
 For medium or large changes, prefer an independent review (a reviewer subagent or command, e.g. security + quality) over self-review alone.
 
@@ -124,8 +114,7 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - Default feature flow: branch `feature/<slug>` from an up-to-date main → spec → plan → implement → test → review → commit → push → PR. Check `git status` before switching branches or pulling. Never carry unrelated uncommitted changes across silently.
 - Commit only when asked or when a project command/workflow says to. Suggest commit points at meaningful milestones.
 - Commits: stage only files related to the task, review the staged diff first, and use a clear imperative message (e.g. `Add expense delete endpoint`).
-- Never without explicit request: force push, `reset --hard`, `clean -fd`, rebase shared branches, delete branches, or rewrite history.
-- Never overwrite, revert, or stash the user's uncommitted work without asking.
+- Never without explicit request: force push, `reset --hard`, `clean -fd`, rebase shared branches, delete branches, or rewrite history. Never overwrite, revert, or stash the user's uncommitted work without asking.
 
 ## Documentation
 - Update docs, README, and specs when your change makes them inaccurate.
@@ -135,17 +124,14 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - Don't generate documentation nobody asked for.
 
 ## Context Management
-- Read the most relevant docs and files first. Use search instead of reading whole directories.
-- Don't load large or generated files (lockfiles, build output, `node_modules`, virtualenvs, data dumps). Respect `.claudeignore`.
+- Read the most relevant docs and files first. Use search instead of reading whole directories. Don't load large or generated files (lockfiles, build output, `node_modules`, virtualenvs, data dumps). Respect `.claudeignore`.
 - Delegate exploration and independent parallel work to subagents, and bring back summaries rather than raw output.
 - Aim for one feature per session. At a natural breakpoint, when context is heavy (~70%), suggest `/compact` or a fresh session. Never compact mid-change.
 - A proposed session card (`own_initiative`) cannot carry a `cwd`, host or preset. For follow-up work in another folder, ask in the wrap-up; on a yes, start it with `user_asked` and the `cwd`.
-- Re-read source when unsure instead of trusting memory from earlier in the session.
-- Persist important decisions in specs, plans, or CLAUDE.md, not only in chat.
+- Re-read source when unsure instead of trusting memory from earlier in the session. Persist important decisions in specs, plans, or CLAUDE.md, not only in chat.
 
 ## Communication
-- Be concise. Lead with what changed and the result.
-- State assumptions, important decisions, and trade-offs briefly.
+- Be concise. Lead with what changed and the result. State assumptions, important decisions, and trade-offs briefly.
 - Report which tests and commands ran and their outcomes. Report failures and unverified areas honestly.
 - Flag uncertainty explicitly. Never present a guess as fact, and never invent files, APIs, commands, or results.
 - Don't ask permission for routine, safe, reversible operations. Always confirm high-impact or destructive ones first.
@@ -156,8 +142,7 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 ## Safety Rules
 - Never delete or overwrite user work, files, or data without confirmation.
 - Never expose, log, or hardcode secrets or credentials. Never commit `.env` files or secret-bearing files.
-- No destructive database operations (DROP, TRUNCATE, mass DELETE, destructive migrations) unless explicitly requested.
-- No destructive shell or Git commands (`rm -rf`, force push, hard reset) unless explicitly requested.
+- No destructive database operations (DROP, TRUNCATE, mass DELETE, destructive migrations) or destructive shell/Git commands (`rm -rf`, force push, hard reset) unless explicitly requested.
 - Treat production config, deployment settings, and CI as high-impact: change them only when asked, and call out the risk.
 - Never claim something works, passes, or is deployed without having verified it.
 - Before publishing or sharing any image, screenshot, PDF or page, check it for passwords, keys, tokens and personal data, and blur or crop them.
@@ -172,15 +157,8 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - [ ] Summary given: what changed, how it was verified, assumptions, open issues, suggested next step or commit
 
 ## graphify
-
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
-
-Rules:
+A project may have a knowledge graph at graphify-out/ (god nodes, communities, cross-file relationships). `/graphify` builds one; use the installed skill (`~/.claude/skills/graphify/SKILL.md`) before anything else.
 - For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
-
-# graphify
-- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
