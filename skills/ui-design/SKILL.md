@@ -1,6 +1,6 @@
 ---
 name: ui-design
-description: "Design rules and a visual feedback loop for building or changing a user interface: web pages, dashboards, components, forms, and mobile app screens (React, HTML/CSS, React Native/Expo, Flutter). Use it whenever a task creates or restyles UI, when the user says 'make it look better', 'design a dashboard/page/screen', 'fix the layout', 'polish the UI', or types /ui-design. It makes Claude look at its own output (screenshot, compare, fix), use the project's real design tokens, and avoid the generic 'AI look'. Skip it for backend-only work and for one-line text or colour changes."
+description: "Design rules and a visual feedback loop for building or changing a user interface: web pages, dashboards, components, forms, and mobile app screens (React, HTML/CSS, React Native/Expo, Flutter). Use it whenever a task creates or restyles UI, including landing pages and marketing sites (conversion intake, specific copy, no invented facts), when the user says 'make it look better', 'design a dashboard/page/screen', 'build a landing page', 'fix the layout', 'polish the UI', or types /ui-design. It makes Claude look at its own output (screenshot, compare, fix), use the project's real design tokens, and avoid the generic 'AI look'. Skip it for backend-only work and for one-line text or colour changes."
 ---
 
 # /ui-design
@@ -30,6 +30,19 @@ Claude's UI output looks generic for a statistical reason: without constraints t
 - **Dashboards:** the most important number is the most visible thing. Label units. Plan empty, loading and error states for every panel. Use the `dataviz` skill for charts when it is available.
 - **Accessibility (WCAG 2.1 AA):** text contrast at least 4.5:1 (3:1 for large text and UI parts), visible keyboard focus, real `<button>`/`<label>`/headings in order, alt text, no meaning by colour alone. Do not add ARIA attributes to make a checker pass; use the right native element.
 - **UX writing:** active verbs on buttons ("Save changes", not "Submit"), sentence case, errors that say what happened and how to fix it, empty states that say what to do next.
+
+### Landing and marketing pages
+A landing page wins one intent: one offer, one audience, one primary action.
+
+- **Intake first.** Before the design plan, ask in one batch for whatever is missing: the one primary action (trial, demo, buy, waitlist) and what counts as a conversion; who the ideal customer is and what problem they have; their top three objections; the traffic source (ads, search, social, email); the proof you have (logos, testimonials, numbers, screenshots). If the user cannot answer, state an assumption in one line and continue.
+- **Be specific.** Not "Save time and streamline", but "Cut your weekly reporting from 4 hours to 15 minutes". Benefits (what it means for them) before features (what it does).
+- **One primary CTA**, the same at the top and the bottom. A verb plus what they get ("Start free trial", "Book a demo"), never "Learn more" or "Submit". No competing CTAs above the fold.
+- **Match the source.** For ad traffic, mirror the ad's promise in the hero.
+- **Objections are a section.** Put proof next to the claim it supports, add an FAQ, and add at least one risk reversal (free trial, cancel anytime, guarantee) only if the user confirms it is true.
+- **Never invent facts.** For a real product, prices, guarantees, statistics, customer counts, testimonials and logos come from the user or a real source. When one is missing, use a marked placeholder such as `{{price}}` or `{{testimonial}}`. Invented names and numbers are fine only in a clearly fictional demo.
+- **Banned filler:** "revolutionize", "supercharge", "cutting edge", "effortless", "transform your workflow", "take it to the next level", "harness the power", "world class". Say what the product does.
+
+Adapted from `landing-page-design` in [elayadesign/AI-DESIGN-SKILLS](https://github.com/elayadesign/AI-DESIGN-SKILLS) (MIT). Its fixed visual style (set fonts, gradient hero text, mandatory scroll animation) is deliberately not copied.
 
 ### Mobile screens (React Native, Flutter, mobile web)
 - Touch targets at least 44×44 pt (iOS) or 48×48 dp (Android).
