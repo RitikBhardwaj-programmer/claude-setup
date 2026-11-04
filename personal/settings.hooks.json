@@ -32,6 +32,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3 \"C:/Users/DELL/.claude/hooks/agent_desktop_guard.py\"",
+            "timeout": 20
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

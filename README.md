@@ -3,7 +3,7 @@
 This is my setup for **Claude Code** (the version of Claude that can work with files and code on your computer). It contains:
 
 - **`CLAUDE.md`**: my rulebook. Claude reads it at the start of every conversation and follows it, a bit like a job contract for an assistant. It makes Claude plan first, avoid guessing, test its work and never delete your stuff without asking.
-- **15 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
+- **16 skills** (recipe cards Claude pulls out when a certain kind of job comes up):
 
 | Skill | What it does | How to use it |
 |---|---|---|
@@ -22,6 +22,7 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 | **ui-design** | When Claude builds or restyles a web page, dashboard or app screen, it follows clear design rules (no generic "AI look", real colours and fonts from your project, accessibility), then looks at its own result in a browser at desktop, tablet and phone size and fixes what it sees | it runs by itself on UI work, or type `/ui-design` |
 | **dimensional-drawing** | Turns a UI component (card, button, dialog) into a one-page black-and-white technical drawing, like Apple's accessory spec sheets: paddings, gaps, corner radii and layers, each as a named variable. It measures the real code in a browser; anything it can't measure is marked `[TBD]`, never guessed. From [enesozturk/dimensional-drawing](https://github.com/enesozturk/dimensional-drawing) (MIT licence) | say "make a dimensional drawing of the Card component" |
 | **dimensional-drawing-motion** | Turns a finished drawing into a ~10 second film of a pen drawing the sheet. Best in Claude's Motion artifact; without it, it needs Node 18+, ffmpeg and Playwright | say "animate the drawing" |
+| **desktop-control** | Lets Claude use desktop apps (File Explorer, Settings, dialogs, the system tray) by reading the app's accessibility map, the same map screen readers use, instead of guessing from screenshots. It uses the free [agent-desktop](https://github.com/vercel-labs/agent-desktop) tool (`npm install -g agent-desktop`), works without moving your mouse, and stops to ask you before irreversible buttons like Send or Delete (on my Windows PC a hook also checks most of these calls). It can also check your own app for buttons a screen reader can't see | say "click X in <app>" or type `/desktop-control` |
 
 - **1 helper agent** (a second Claude with its own fresh memory that does one job and reports back):
   - **design-review**: checks a finished screen like a senior designer would (flows, three screen sizes, polish, accessibility, error and empty states) and lists problems from "Blocker" to "Nit". It only reports; it never changes your code. Adapted from [OneRedOak/claude-code-workflows](https://github.com/OneRedOak/claude-code-workflows) (MIT licence).
@@ -101,7 +102,7 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 | `mods/token-saver/`, `.claude-plugin/marketplace.json` | The token-saver mod (bump `version` in its plugin.json with every edit, or the installed copy stays old; `check_drift.py` flags it), and this repo as a local marketplace (`claude-setup`) that lists it | Mac and Windows |
 | `personal/CLAUDE.personal.md` | My personal rules (explanation style, Windows shell, Brain vault, this workflow), appended to `CLAUDE.md` | Windows only |
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
-| `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, long-heredoc guard, retro nudge, handoff reminder) and their registration | Windows only |
+| `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, long-heredoc guard, agent-desktop guard, retro nudge, handoff reminder) and their registration | Windows only |
 | `personal/settings.skill-overrides.json` | The `skillOverrides` block of `settings.json`: skills listed to Claude by name only, to save tokens on every response | Windows only |
 | `personal/setup.json` | Per-machine paths read by the portable skills (Python, retro notes, notes repo, this repo) | Windows only |
 | `shared/agent-bridge-rules.md` | The short rules block (handoff protocol, one writer per file set, never wrap another vendor's agent) that the Windows installer merges into `~/.codex/AGENTS.md` | Windows only (for now) |
