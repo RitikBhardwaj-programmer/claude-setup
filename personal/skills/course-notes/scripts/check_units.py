@@ -32,23 +32,29 @@ def secs(mmss):
 def unit_map(course):
     units = {}
     for line in (course / "Overview.md").read_text(encoding="utf-8").splitlines():
-        m = re.match(r"\|\s*(U\d{2})\b[^|]*\|\s*L(\d+)(?:\s*[–-]\s*L(\d+))?\s*\|", line)
-        if m:
-            lo = int(m.group(2))
-            units[m.group(1)] = (lo, int(m.group(3) or lo))
+        # lecture cell: "L5–L7", "L15", or a list with part suffixes such as "L14, L15a, L15b"
+        m = re.match(r"\|\s*(U\d{2})\b[^|]*\|([^|]*)\|", line)
+        nums = [int(n) for n in re.findall(r"L(\d+)[a-z]?", m.group(2))] if m else []
+        if nums:
+            units[m.group(1)] = (min(nums), max(nums))
     return units
 
 
+def lec_num(lec):
+    """'L07' -> 7, 'L15a' -> 15 (parts of one lecture share its number)."""
+    return int(re.match(r"L(\d+)", lec).group(1))
+
+
 def load_sources(course):
-    ids, trans = {}, {}
+    ids, trans = {}, {}  # ids: lecture number -> set of video ids (a split lecture has several)
     tsv = course / "sources.tsv"
     if tsv.exists():
         for line in tsv.read_text(encoding="utf-8").splitlines()[1:]:
             lec, vid = line.split("\t")[:2]
-            ids[int(lec[1:])] = vid
+            ids.setdefault(lec_num(lec), set()).add(vid)
     for t in (course / "transcripts").glob("L* *.txt") if (course / "transcripts").exists() else []:
         lec, rest = t.stem.split(" ", 1)
-        ids.setdefault(int(lec[1:]), rest.split(".")[0])
+        ids.setdefault(lec_num(lec), set()).add(rest.split(".")[0])
         lines = [(secs(m.group(1)), m.group(2)) for m in
                  re.finditer(r"^\[([\d:]+)\] (.*)$", t.read_text(encoding="utf-8"), re.M)]
         trans[rest.split(".")[0]] = lines
@@ -101,7 +107,7 @@ def main(argv):
         if only and u not in only:
             continue
         lo, hi = units.get(u, (0, -1))
-        allowed = {ids[n] for n in range(lo, hi + 1) if n in ids}
+        allowed = {v for n in range(lo, hi + 1) for v in ids.get(n, ())}
         words, probs, notes, txt = check(f, names, allowed, trans)
         bad += bool(probs)
         print(f"{f.name}: {words} words; {'OK' if not probs else 'PROBLEMS: ' + '; '.join(probs)}")
