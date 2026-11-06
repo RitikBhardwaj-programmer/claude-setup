@@ -13,6 +13,8 @@ Does every conversion the COA mirror needed (so no model has to rewrite content 
 - [[Note name]] wikilinks -> bold text; RTN like [[R1]] (no space) stays
 - table cells: a leading "+" and "`code` + x" become a bold **+** (Notion makes them bullets)
 - "$" outside code -> "\\$" (a $...$ pair would become inline math)
+- literal "*" outside code (a*, Σ*, (a+b)*, ∅*) -> "\\*" (Notion turns 0*1* into 0<i>1</i>);
+  **bold**, *italic* and "* " bullets stay; a table cell starting "* q1" -> "`*` q1"
 - unlabelled code fences -> ```txt (Notion otherwise guesses "javascript")
 - blank lines before tables and toggles
 With --max-chars, a long result is also written as <out>.part1.md, .part2.md ... split only at
@@ -83,8 +85,29 @@ def fix_table_row(line):
         c = cells[k]
         c = re.sub(r"^(\s*)\+(\s)", r"\1**+**\2", c)
         c = re.sub(r"`(\s+)\+(\s+)", r"`\1**+**\2", c)
+        c = re.sub(r"^(\s*)\*(\s)", r"\1`*`\2", c)  # "* q1" final-state marker: Notion makes it a bullet
         cells[k] = c
     return "|".join(cells)
+
+
+# An italic span opens with "*" at the start or after a space/opening bracket, and closes with "*"
+# that is not followed by a letter. Every other single "*" (a*, Σ*, )*, ∅*, 0*1*) is a literal star.
+ITALIC = re.compile(r"(?:^|(?<=[\s(\[{\"'“‘/—–-]))\*(?=[^\s*])(.+?)(?<=[^\s*\\])\*(?!\w)")
+
+
+def escape_stars(line):
+    """Escape literal stars outside code spans; keep **bold**, *italic* and a leading "* " bullet."""
+    lead = ""
+    m = re.match(r"^(\s*\* )", line)
+    if m:
+        lead, line = m.group(1), line[m.end():]
+    parts = line.split("`")
+    for k in range(0, len(parts), 2):
+        p = parts[k].replace("\\*", "\x03").replace("**", "\x01")  # keep stars the author escaped
+        p = ITALIC.sub(lambda m: "\x02" + m.group(1) + "\x02", p)
+        p = p.replace("*", "\\*")
+        parts[k] = p.replace("\x02", "*").replace("\x01", "**").replace("\x03", "\\*")
+    return lead + "`".join(parts)
 
 
 def escape_dollars(line):
@@ -123,7 +146,7 @@ def convert(text):
 
     text = re.sub(r"<details><summary>(.*?)</summary>(.*?)</details>", toggle, text, flags=re.S)
     text = re.sub(r"\[\[(?:[^\]|]*/)?([^\]|/]* [^\]|]*)\]\]", r"**\1**", text)
-    text = "\n".join(escape_dollars(fix_table_row(ln) if ln.startswith("|") else ln)
+    text = "\n".join(escape_stars(escape_dollars(fix_table_row(ln) if ln.startswith("|") else ln))
                      for ln in text.split("\n"))
     text = re.sub(r"(?m)^(?!\|)(.+)\n(?=\||<toggle>)", r"\1\n\n", text)
     text = re.sub(r"\n{3,}", "\n\n", text).strip() + "\n"
