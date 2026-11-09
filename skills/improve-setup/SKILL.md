@@ -60,7 +60,7 @@ Group symptoms by cause, not by tool. Example: three different shell failures ma
 
 ## 6. Propose; build nothing yet
 1. Show a ranked table: **#, finding, evidence (counts plus 1–2 examples), root cause, proposed change, target, effort (S/M/L), risk.** Put the cheapest high-value items first.
-2. Ask which to build with AskUserQuestion (multi-select, up to 4 options per question; batch if more). Offer "none" too.
+2. Ask which to build with AskUserQuestion (multi-select, up to 4 options per question; batch if more). Offer "none" too. If that tool is not available, ask in your reply and let the user answer with numbers.
 3. Large items (a new skill or hook) get a short plan in chat before building, even if approved.
 
 ## 7. Build the approved items (quality gates)
