@@ -77,10 +77,10 @@ For each item:
 6. **Commit only this run's files:**
    - setup repo: stage files by name, review the diff, commit, and push only if the user agreed;
    - notes repo: `PY SK/scripts/commit_own.py --file <rel path> ... --log-match "<your log line>" --message "..."`. Other sessions' uncommitted work and log lines stay untouched.
-7. Report each item as built + verified, or not built and why.
+7. Report each item as built + verified, or not built and why. With a setup repo, an item is "built" only when it is on the default branch and installed. Until then, report it as "built, not merged" and name the branch or PR.
 
 ## 8. Record
-1. Copy `SK/retro-template.md` to `<retros_dir>/YYYY-MM-DD <topic>.md`. Fill it in, with `covers_since` and `covers_until` and every finding's decision: approved and built / approved, not built / rejected / deferred.
+1. Copy `SK/retro-template.md` to `<retros_dir>/YYYY-MM-DD <topic>.md`. Fill it in, with `covers_since` and `covers_until` and every finding's decision: approved and built / built, not merged / approved, not built / rejected / deferred.
 2. With a notes repo: add one line to `notes_log` and commit with `commit_own.py`.
 3. Reply with a 3–6 line summary and the note path.
 
