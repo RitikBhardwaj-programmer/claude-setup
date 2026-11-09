@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
                        HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, env_block, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
-                       read_json_file, skill_overrides_block, skill_sources, want_mcp_json, writer_task_action,
+                       read_json_file, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
                        writer_task_drift)
 
 
@@ -251,11 +251,16 @@ def main():
     print(("DRY RUN - would install: " if a.dry_run else "Installed: ") + ", ".join(actions))
     if backed and not a.dry_run:
         print(f"Backup of replaced files: {backup}")
+    warning = stale_checkout_warning()
     if not a.dry_run:
         left = drift(personal)
         print("Drift check: in sync" if not left else "Drift check found:\n  - " + "\n  - ".join(left))
         print("Start a NEW Claude Code session to load changed CLAUDE.md, skills and hooks.")
+        if warning:
+            print(warning)
         return 1 if left else 0
+    if warning:
+        print(warning)
     return 0
 
 
