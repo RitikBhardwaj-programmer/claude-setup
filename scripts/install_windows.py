@@ -1,5 +1,5 @@
 """Install this repo into ~/.claude on Windows: shared + personal parts, subagents, marketplace plugins, hooks,
-setup.json, the hooks and skillOverrides blocks of settings.json and the agent bridge (Codex rules block, Antigravity
+setup.json, the hooks, skillOverrides and env blocks of settings.json and the agent bridge (Codex rules block, Antigravity
 skills.json and basic-memory MCP entry). Everything it replaces is backed up first. Called by install.ps1.
 
   py -3 scripts/install_windows.py [--dry-run] [--shared-only]
@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
                        HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
-                       compose_claude_md, drift, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
+                       compose_claude_md, drift, env_block, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
                        read_json_file, skill_overrides_block, skill_sources, want_mcp_json, writer_task_action,
                        writer_task_drift)
 
@@ -138,12 +138,14 @@ def main():
             actions.append("setup.json")
             if not a.dry_run:
                 shutil.copy2(sj, DEST / "setup.json")
-        # 5. settings.json: replace only the hooks and skillOverrides blocks
+        # 5. settings.json: replace only the hooks, skillOverrides and env blocks
         settings_path = DEST / "settings.json"
         settings = json.loads(settings_path.read_text(encoding="utf-8")) if settings_path.is_file() else {}
         want = {"hooks": hooks_block()}
         if skill_overrides_block() is not None:
             want["skillOverrides"] = skill_overrides_block()
+        if env_block() is not None:
+            want["env"] = env_block()
         changed = [k for k, v in want.items() if settings.get(k) != v]
         if changed:
             save(settings_path)
