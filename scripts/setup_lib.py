@@ -136,6 +136,35 @@ def env_block():
     return json.loads(f.read_text(encoding="utf-8"))["env"] if f.is_file() else None
 
 
+def commits_behind_origin(repo=REPO, base="main"):
+    """How many commits origin/base has that this checkout lacks, or None if git cannot tell.
+
+    It fetches first, so new remote commits count. Without a network it uses the last fetched state.
+    """
+    git = ["git", "-C", str(repo)]
+    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")  # never wait for a password prompt
+    try:
+        subprocess.run([*git, "fetch", "--quiet", "origin", base], capture_output=True, timeout=15, env=env)
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    try:
+        out = subprocess.run([*git, "rev-list", "--count", f"HEAD..origin/{base}"], capture_output=True,
+                             text=True, timeout=15, check=True).stdout
+        return int(out)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+
+
+def stale_checkout_warning(repo=REPO, base="main"):
+    """A warning when this checkout is behind origin/base, else an empty string."""
+    behind = commits_behind_origin(repo, base)
+    if not behind:
+        return ""
+    return (f"WARNING: this checkout is {behind} commit(s) behind origin/{base}, so it installs an older setup. "
+            f'"In sync" only compares ~/.claude with this checkout. '
+            f"Update from origin/{base}, then run the installer again.")
+
+
 def tree_diff(src: Path, dst: Path):
     """List of relative paths that differ between two folders (missing, extra or changed files)."""
     if not dst.is_dir():

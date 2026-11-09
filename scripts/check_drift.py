@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import PERSONAL, drift  # noqa: E402
+from setup_lib import PERSONAL, drift, stale_checkout_warning  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -53,6 +53,9 @@ def main():
         print(f"Note: {len(branches)} local branch(es) have work not on main:")
         for name, count in branches:
             print(f"  - {name}: {count} commit(s)")
+    warning = stale_checkout_warning()
+    if warning:
+        print(warning)
     if not found:
         print("In sync: ~/.claude matches the claude-setup repo.")
         return 0
