@@ -165,6 +165,36 @@ def stale_checkout_warning(repo=REPO, base="main"):
             f"Update from origin/{base}, then run the installer again.")
 
 
+def uncommitted_files(repo=REPO):
+    """`git status --porcelain` lines (modified, staged or untracked files), or [] if git cannot tell.
+
+    An installed but uncommitted change looks "in sync", because drift compares the working tree.
+    """
+    try:
+        out = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=15, check=True).stdout
+        return [line for line in out.splitlines() if line.strip()]
+    except (OSError, subprocess.SubprocessError):
+        return []
+
+
+def dirty_tree_note(repo=REPO, limit=10):
+    """A note listing uncommitted files in the repo, else an empty string."""
+    dirty = uncommitted_files(repo)
+    if not dirty:
+        return ""
+    try:
+        branch = subprocess.run(["git", "-C", str(repo), "branch", "--show-current"], capture_output=True,
+                                text=True, timeout=15, check=True).stdout.strip() or "detached HEAD"
+    except (OSError, subprocess.SubprocessError):
+        branch = "unknown branch"
+    lines = [f"Note: {len(dirty)} uncommitted file(s) on {branch} (installed but not in git; commit them):"]
+    lines += [f"  {line}" for line in dirty[:limit]]
+    if len(dirty) > limit:
+        lines.append(f"  ... and {len(dirty) - limit} more")
+    return "\n".join(lines)
+
+
 def tree_diff(src: Path, dst: Path):
     """List of relative paths that differ between two folders (missing, extra or changed files)."""
     if not dst.is_dir():

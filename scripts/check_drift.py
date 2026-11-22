@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import PERSONAL, drift, stale_checkout_warning  # noqa: E402
+from setup_lib import PERSONAL, dirty_tree_note, drift, stale_checkout_warning  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -43,17 +43,6 @@ def unmerged_branches(repo=REPO, base="main"):
         return []  # no git, not a repo or no base branch: the drift check must still work
 
 
-def uncommitted_files(repo=REPO):
-    """Return `git status --porcelain` lines (modified, staged or untracked files) in the repo.
-
-    An installed but uncommitted change looks "in sync", because drift compares the working tree.
-    """
-    try:
-        return [line for line in git(repo, "status", "--porcelain").splitlines() if line.strip()]
-    except (OSError, subprocess.CalledProcessError):
-        return []
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shared-only", action="store_true")
@@ -65,14 +54,9 @@ def main():
         print(f"Note: {len(branches)} local branch(es) have work not on main:")
         for name, count in branches:
             print(f"  - {name}: {count} commit(s)")
-    dirty = uncommitted_files()
-    if dirty:
-        branch = git(REPO, "branch", "--show-current").strip() or "detached HEAD"
-        print(f"Note: {len(dirty)} uncommitted file(s) on {branch} (installed but not in git):")
-        for line in dirty[:10]:
-            print(f"  {line}")
-        if len(dirty) > 10:
-            print(f"  ... and {len(dirty) - 10} more")
+    note = dirty_tree_note()
+    if note:
+        print(note)
     warning = stale_checkout_warning()
     if warning:
         print(warning)

@@ -21,7 +21,7 @@ from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGEN
                        HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, env_block, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
                        read_json_file, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
-                       writer_task_drift)
+                       writer_task_drift, dirty_tree_note)
 
 
 def main():
@@ -252,6 +252,9 @@ def main():
     if backed and not a.dry_run:
         print(f"Backup of replaced files: {backup}")
     warning = stale_checkout_warning()
+    note = dirty_tree_note()
+    if note:
+        print(note)
     if not a.dry_run:
         left = drift(personal)
         print("Drift check: in sync" if not left else "Drift check found:\n  - " + "\n  - ".join(left))

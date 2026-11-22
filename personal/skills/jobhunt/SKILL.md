@@ -113,5 +113,6 @@ Goal: the form is filled, the user clicks submit. Needs a draft (if none, run dr
 - Adzuna `salary_*` is often an estimate; it is labelled "(estimated)" in `stipend`. Do not treat it as a real offer.
 - Adzuna fixture in the tests is hand-written from the API docs; the live response shape was not verified without keys. If a live run fails to parse, check `parse_results` first.
 - Internshala pages: the "recaptcha" word and a site key appear on normal pages (login form), so the script's block check ignores them and fires only on a card-less page with CAPTCHA / unusual-traffic / Cloudflare text. Pagination is `/internships/<category>-internship/page-N/`. The tests use a fixture trimmed from a real 2026-11-10 page.
+- Tests: run `py -3 -m pytest -q` in `scripts/` (44 tests, fixtures only, no network). They are pytest-style: `py -3 -m unittest` finds 0 tests and prints "NO TESTS RAN", which is not a pass.
 - Company ATS pages can change their form; if a field cannot be found, say so rather than guessing.
 - Search first for the company's own careers page when only a LinkedIn/Naukri alert is known; apply there if it exists (the user's decision).
