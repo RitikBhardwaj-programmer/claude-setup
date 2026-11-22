@@ -136,6 +136,18 @@ def env_block():
     return json.loads(f.read_text(encoding="utf-8"))["env"] if f.is_file() else None
 
 
+def permissions_allow_block():
+    """permissions.allow entries the repo requires in settings.json, or [] when it manages none."""
+    f = PERSONAL / "settings.permissions.json"
+    return json.loads(f.read_text(encoding="utf-8"))["allow"] if f.is_file() else []
+
+
+def missing_allow_rules(settings: dict) -> list:
+    """Repo permissions.allow entries that settings does not have yet (other entries are the user's)."""
+    have = (settings.get("permissions") or {}).get("allow") or []
+    return [r for r in permissions_allow_block() if r not in have]
+
+
 def commits_behind_origin(repo=REPO, base="main"):
     """How many commits origin/base has that this checkout lacks, or None if git cannot tell.
 
@@ -269,6 +281,8 @@ def drift(with_personal: bool):
         env = env_block()
         if env is not None and live_settings.get("env") != env:
             found.append("settings.json: env differs from personal/settings.env.json")
+        for rule in missing_allow_rules(live_settings):
+            found.append(f"settings.json: permissions.allow lacks {rule} (personal/settings.permissions.json)")
         sj = PERSONAL / "setup.json"
         live_sj = DEST / "setup.json"
         if sj.is_file() and (not live_sj.is_file() or

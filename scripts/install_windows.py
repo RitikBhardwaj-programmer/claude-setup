@@ -4,7 +4,8 @@ skills.json and basic-memory MCP entry). Everything it replaces is backed up fir
 
   py -3 scripts/install_windows.py [--dry-run] [--shared-only]
 
-Leaves alone: other settings keys (theme, permissions...), ~/.claude/skills/synced, tools/, projects/, any
+Adds the permissions.allow rules of personal/settings.permissions.json that are missing (never removes any).
+Leaves alone: other settings keys (theme, the rest of permissions...), ~/.claude/skills/synced, tools/, projects/, any
 skill that is not in this repo (reported, not deleted).
 """
 import argparse
@@ -20,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
                        HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, env_block, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
-                       read_json_file, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
+                       missing_allow_rules, read_json_file, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
                        writer_task_drift, dirty_tree_note)
 
 
@@ -138,7 +139,7 @@ def main():
             actions.append("setup.json")
             if not a.dry_run:
                 shutil.copy2(sj, DEST / "setup.json")
-        # 5. settings.json: replace only the hooks, skillOverrides and env blocks
+        # 5. settings.json: replace only the hooks, skillOverrides and env blocks; add missing permissions.allow rules
         settings_path = DEST / "settings.json"
         settings = json.loads(settings_path.read_text(encoding="utf-8")) if settings_path.is_file() else {}
         want = {"hooks": hooks_block()}
@@ -147,6 +148,13 @@ def main():
         if env_block() is not None:
             want["env"] = env_block()
         changed = [k for k, v in want.items() if settings.get(k) != v]
+        new_rules = missing_allow_rules(settings)
+        if new_rules:
+            # add only the repo's rules; the user's own permissions entries stay
+            perms = dict(settings.get("permissions") or {})
+            perms["allow"] = list(perms.get("allow") or []) + new_rules
+            want["permissions"] = perms
+            changed.append("permissions")
         if changed:
             save(settings_path)
             settings.update({k: want[k] for k in changed})

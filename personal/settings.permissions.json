@@ -1,0 +1,7 @@
+{
+  "_comment": "Entries install.ps1 adds to permissions.allow in ~/.claude/settings.json (it adds missing ones and never removes others; check_drift.py reports missing ones). Why: on 2026-11-22 the unattended weekly-brain-review run stopped at its first Bash call ('Tool permission stream closed before response received'), because nobody could answer the prompt. These rules cover only the commands that task needs: the vault health check and git inside the vault.",
+  "allow": [
+    "Bash(python C:\\Users\\DELL\\Brain\\tools\\hooks\\brain_health.py)",
+    "Bash(git -C C:\\Users\\DELL\\Brain:*)"
+  ]
+}
