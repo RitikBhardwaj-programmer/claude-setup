@@ -157,8 +157,5 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - [ ] Summary given: what changed, how it was verified, assumptions, open issues, suggested next step or commit
 
 ## graphify
-A project may have a knowledge graph at graphify-out/ (god nodes, communities, cross-file relationships). `/graphify` builds one; use the installed skill (`~/.claude/skills/graphify/SKILL.md`) before anything else.
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+If graphify-out/graph.json exists (`/graphify` builds it; follow `~/.claude/skills/graphify/SKILL.md`), answer codebase questions with `graphify query "<q>"`, `graphify path "<A>" "<B>"` or `graphify explain "<concept>"` first: they return a scoped subgraph, much smaller than GRAPH_REPORT.md or raw grep. Use graphify-out/wiki/index.md, if present, for broad navigation. Read GRAPH_REPORT.md only for broad architecture review or when query/path/explain fall short.
+After modifying code, run `graphify update .` (AST-only, no API cost).

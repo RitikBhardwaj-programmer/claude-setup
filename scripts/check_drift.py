@@ -5,8 +5,9 @@
 Run it before changing the setup (to catch edits made directly in ~/.claude) and after install.
 Fix drift by copying the live change INTO the repo (if it should be kept) and running the installer.
 
-It also lists local branches with work that is not on main. This is a note, not drift: the exit code
-does not change. Drift compares only the checked-out tree, so unmerged fixes are invisible to it.
+It also lists local branches with work that is not on main, and uncommitted files in the repo.
+These are notes, not drift: the exit code does not change. Drift compares only the checked-out
+working tree, so unmerged and uncommitted fixes are invisible to it.
 """
 import argparse
 import subprocess
@@ -42,6 +43,17 @@ def unmerged_branches(repo=REPO, base="main"):
         return []  # no git, not a repo or no base branch: the drift check must still work
 
 
+def uncommitted_files(repo=REPO):
+    """Return `git status --porcelain` lines (modified, staged or untracked files) in the repo.
+
+    An installed but uncommitted change looks "in sync", because drift compares the working tree.
+    """
+    try:
+        return [line for line in git(repo, "status", "--porcelain").splitlines() if line.strip()]
+    except (OSError, subprocess.CalledProcessError):
+        return []
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--shared-only", action="store_true")
@@ -53,6 +65,14 @@ def main():
         print(f"Note: {len(branches)} local branch(es) have work not on main:")
         for name, count in branches:
             print(f"  - {name}: {count} commit(s)")
+    dirty = uncommitted_files()
+    if dirty:
+        branch = git(REPO, "branch", "--show-current").strip() or "detached HEAD"
+        print(f"Note: {len(dirty)} uncommitted file(s) on {branch} (installed but not in git):")
+        for line in dirty[:10]:
+            print(f"  {line}")
+        if len(dirty) > 10:
+            print(f"  ... and {len(dirty) - 10} more")
     warning = stale_checkout_warning()
     if warning:
         print(warning)
