@@ -1,7 +1,15 @@
 {
-  "_comment": "Entries install.ps1 adds to permissions.allow in ~/.claude/settings.json (it adds missing ones and never removes others; check_drift.py reports missing ones). Why: on 2026-11-22 the unattended weekly-brain-review run stopped at its first Bash call ('Tool permission stream closed before response received'), because nobody could answer the prompt. These rules cover only the commands that task needs: the vault health check and git inside the vault.",
+  "_comment": "install.ps1 adds the 'allow' entries to permissions.allow in ~/.claude/settings.json when missing, and removes the 'retired' entries; it never touches other rules. check_drift.py reports a missing or a retired one. Why: on 2026-11-22 the unattended weekly-brain-review run stopped at its first Bash call ('Tool permission stream closed before response received'), because nobody could answer the prompt. The rules cover only what that task runs. git is allowed per subcommand, because a ':*' rule is a prefix match: 'git -C <vault>:*' also allowed 'push --force' and 'reset --hard' (PR 31 review). 'push' has no wildcard, so 'push --force' still prompts.",
   "allow": [
     "Bash(python C:\\Users\\DELL\\Brain\\tools\\hooks\\brain_health.py)",
+    "Bash(git -C C:\\Users\\DELL\\Brain status:*)",
+    "Bash(git -C C:\\Users\\DELL\\Brain log:*)",
+    "Bash(git -C C:\\Users\\DELL\\Brain diff:*)",
+    "Bash(git -C C:\\Users\\DELL\\Brain add:*)",
+    "Bash(git -C C:\\Users\\DELL\\Brain commit -m:*)",
+    "Bash(git -C C:\\Users\\DELL\\Brain push)"
+  ],
+  "retired": [
     "Bash(git -C C:\\Users\\DELL\\Brain:*)"
   ]
 }

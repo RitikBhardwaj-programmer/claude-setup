@@ -146,16 +146,26 @@ def env_block():
     return json.loads(f.read_text(encoding="utf-8"))["env"] if f.is_file() else None
 
 
+def _permissions_file() -> dict:
+    f = PERSONAL / "settings.permissions.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.is_file() else {}
+
+
 def permissions_allow_block():
     """permissions.allow entries the repo requires in settings.json, or [] when it manages none."""
-    f = PERSONAL / "settings.permissions.json"
-    return json.loads(f.read_text(encoding="utf-8"))["allow"] if f.is_file() else []
+    return _permissions_file().get("allow", [])
 
 
 def missing_allow_rules(settings: dict) -> list:
     """Repo permissions.allow entries that settings does not have yet (other entries are the user's)."""
     have = (settings.get("permissions") or {}).get("allow") or []
     return [r for r in permissions_allow_block() if r not in have]
+
+
+def retired_allow_rules(settings: dict) -> list:
+    """Rules the repo once added and now removes (the 'retired' list) that settings still has."""
+    have = (settings.get("permissions") or {}).get("allow") or []
+    return [r for r in _permissions_file().get("retired", []) if r in have]
 
 
 def commits_behind_origin(repo=REPO, base="main"):
@@ -301,6 +311,8 @@ def drift(with_personal: bool):
             found.append("settings.json: env differs from personal/settings.env.json")
         for rule in missing_allow_rules(live_settings):
             found.append(f"settings.json: permissions.allow lacks {rule} (personal/settings.permissions.json)")
+        for rule in retired_allow_rules(live_settings):
+            found.append(f"settings.json: permissions.allow still has retired {rule} (personal/settings.permissions.json)")
         sj = PERSONAL / "setup.json"
         live_sj = DEST / "setup.json"
         if sj.is_file() and (not live_sj.is_file() or

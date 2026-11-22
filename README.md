@@ -105,7 +105,7 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
 | `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, long-heredoc guard, agent-desktop guard, retro nudge, handoff reminder) and their registration | Windows only |
 | `personal/settings.skill-overrides.json` | The `skillOverrides` block of `settings.json`: skills listed to Claude by name only, to save tokens on every response | Windows only |
-| `personal/settings.permissions.json` | `permissions.allow` rules the installer adds to `settings.json` when missing (it never removes your own): the vault health check and `git -C C:\Users\DELL\Brain`, so the unattended weekly brain review does not stop at a prompt | Windows only |
+| `personal/settings.permissions.json` | `permissions.allow` rules the installer adds to `settings.json` when missing, plus `retired` rules it removes (it never touches your own): the vault health check and `git -C C:\Users\DELL\Brain` `status`, `log`, `diff`, `add`, `commit -m` and plain `push` (no `push --force` or `reset`), so the unattended weekly brain review does not stop at a prompt | Windows only |
 | `personal/setup.json` | Per-machine paths read by the portable skills (Python, retro notes, notes repo, this repo) | Windows only |
 | `shared/agent-bridge-rules.md` | The short rules block (handoff protocol, one writer per file set, never wrap another vendor's agent) that the Windows installer merges into `~/.codex/AGENTS.md` | Windows only (for now) |
 | `scripts/` | Windows installer logic and the drift check | — |
