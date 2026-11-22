@@ -1,0 +1,331 @@
+{
+ "hits": {
+  "total": {
+   "value": 18
+  },
+  "hits": [
+   {
+    "_source": {
+     "country": "India",
+     "devfolio_official": null,
+     "featured": null,
+     "private": false,
+     "starts_at": "2026-11-14T07:30:00+00:00",
+     "hosted_by": null,
+     "hashtags": [],
+     "apply_mode": "both",
+     "city": "Ludhiana",
+     "timezone": "Asia/Calcutta",
+     "rating": 0,
+     "type": "HACKATHON",
+     "uuid": "c4045a4afcb94f6f89cfb8c48dfdf892",
+     "sponsor_tiers": [],
+     "themes": [],
+     "hackathon_setting": {
+      "winner_announce_at": null,
+      "reg_starts_at": "2026-08-20T18:30:00+00:00",
+      "winner_announced": false,
+      "women_only": false,
+      "reg_ends_at": "2026-11-10T06:30:00+00:00",
+      "external_apply_url": null,
+      "primary_color": "#fd7a03",
+      "uuid": "8315990863cc43f3aa71e9731b5a437e",
+      "contact_email": "redacted@example.com",
+      "review": false,
+      "logo": "https://assets.devfolio.co/hackathons/c4045a4afcb94f6f89cfb8c48dfdf892/assets/logo/630.png",
+      "subdomain": "hacknauts26"
+     },
+     "ends_at": "2026-11-15T07:30:00+00:00",
+     "is_online": false,
+     "state": "Punjab",
+     "slug": "hacknauts26",
+     "team_min": 2,
+     "themed": false,
+     "discover": false,
+     "participants_count": 1601,
+     "hackathon_faqs": [
+      {
+       "question": "What is Hacknauts2.0 ?",
+       "answer": "Hacknauts is a 24-hour hackathon that aims to bring together developers, designers, and entrepreneurs to create innovative solutions to real-world problems.",
+       "uuid": "480e403ec6f64c93b082601021204c77"
+      },
+      {
+       "question": "Who can participate in Hacknauts2.0?",
+       "answer": "The hackathon is open to students pursuing undergraduate or postgraduate degrees in computer science, engineering, or related fields.",
+       "uuid": "112720d400de42d7a971d58a793bd285"
+      },
+      {
+       "question": "Will there be food arrangements?",
+       "answer": "Yes! There will be major meals and snacks provided to keep your energy up throughout the event. Your well-being is just as important to us as your creativity!",
+       "uuid": "70f101386caa4432b087dedc8a223fcb"
+      },
+      {
+       "question": "Is there a preliminary round before the hackathon?",
+       "answer": "Yes! Participants are required to submit a PowerPoint presentation (PPT) outlining their idea and solution.",
+       "uuid": "c0677179c06e44e6a3427a0953e3eef7"
+      },
+      {
+       "question": "How will offline participants be selected?",
+       "answer": "Offline participation will be based on the evaluation of submitted ideas in the PPT. Only the best submissions will be invited to attend the hackathon in person.",
+       "uuid": "bb943e1e093a427685a1dc54ad7f7849"
+      },
+      {
+       "question": "What if I feel sleepy during the Hackathon?",
+       "answer": "Don't worry! We'll keep the energy up with engaging activities throughout the event. If you need a break, there will be designated resting zones, or you can take a quick nap at your desk 💤.",
+       "uuid": "4bfa93d9de48443d9d47b6ad6072b786"
+      }
+     ],
+     "participants_details": [],
+     "team_size": 4,
+     "verified": true,
+     "prizes": [
+      {
+       "parent_prize_uuid": null,
+       "name": "Winner",
+       "is_sponsor_prize": false,
+       "uuid": "72a155d1c20b43f0ab1577ae3d3dab1a",
+       "desc": ""
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "1nd Runner Up",
+       "is_sponsor_prize": false,
+       "uuid": "3fc5d4f978454618896dec1bcace4d38",
+       "desc": ""
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "2nd Runner Up",
+       "is_sponsor_prize": false,
+       "uuid": "236272acb2ae4b47af103a117ae4751e",
+       "desc": ""
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "Best Freshers team",
+       "is_sponsor_prize": false,
+       "uuid": "57955dfd0e4740baa3e1a39f005b80ee",
+       "desc": "🏆 Best Freshers Team - Awarded to the best-performing team made up of first-year students, recognizing their creativity, technical skills, and overall performance."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "Best Girls Team",
+       "is_sponsor_prize": false,
+       "uuid": "f155c633422d4184ade7b0017dfcf54b",
+       "desc": "👩‍💻 Best Girls Team - Awarded to the best-performing all-girls team, recognizing their innovation, teamwork, technical skills, and overall performance."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "CodeCrafters VIP — 1st Place (2-Year Membership)",
+       "is_sponsor_prize": false,
+       "uuid": "49a93cd369514c3888884f70dc5b6b95",
+       "desc": "2-Year CodeCrafters VIP Membership (~$720 value per member) for the 1st Place Champion team. Full access to advanced systems programming challenges — rebuild Redis, Git, SQLite, Kafka & Docker from scratch."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "CodeCrafters VIP — 2nd Place (1-Year Membership)",
+       "is_sponsor_prize": false,
+       "uuid": "bd7baef07c8d44d18e9453c14b4daad1",
+       "desc": "1-Year CodeCrafters VIP Membership (~$360 value per member) for the 2nd Place runner-up team. Year-long unrestricted access to all CodeCrafters tracks & challenges in Rust, Go, Python, C++, TypeScript & more."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "CodeCrafters VIP — 3rd Place (6-Month Membership)",
+       "is_sponsor_prize": false,
+       "uuid": "621219b723b348ee8efc3253d4ff002f",
+       "desc": "6-Month CodeCrafters VIP Membership (~$180 value per member) for the 3rd Place team. Full access to rebuild production systems with instant test runner feedback on git push."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "Track / Bounty Prize (Voice AI Track)",
+       "is_sponsor_prize": false,
+       "uuid": "acdc2db87c4f469fb82662d8afadd880",
+       "desc": "3-Month ElevenLabs Scale Tier license ($897 value / 1.8M credits per month) awarded to the best project built using ElevenLabs Voice AI APIs or Conversational Agents."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "1st Place Squad Grant (Pro Tier)",
+       "is_sponsor_prize": false,
+       "uuid": "25ec023a72364ed187646b8f8c7ca6b8",
+       "desc": "3-Month ElevenLabs Pro Tier license ($297 value / 600K credits per month) awarded to all members of the 1st Place Grand Champion team."
+      },
+      {
+       "parent_prize_uuid": null,
+       "name": "Universal Participant Perk (Creator Tier)",
+       "is_sponsor_prize": false,
+       "uuid": "3a8c860eab574216ab61ab863109082e",
+       "desc": "-Month free access with 131,000 character credits provided universally to all registered and verified hackathon participants."
+      }
+     ],
+     "projects_submitted": 0,
+     "name": "Hacknauts 2.0",
+     "tagline": null,
+     "location": "Guru Nanak Dev Engineering College, Gill Road, Gill Park, Ludhiana, Punjab, India",
+     "judges": [],
+     "cover_img": null,
+     "desc": "# 🚀 Hacknauts 2.0 ### 🌌 Beyond the Known, Begins the Extraordinary **Hacknauts 2.0 (HKN-26)** is a 24-hour hackathon at **Guru Nanak Dev Engineering College, Ludhiana**, organized by the **Causmic Clu",
+     "status": "publish",
+     "user_hackathon": null,
+     "user_hackathon_reminder": null
+    }
+   },
+   {
+    "_source": {
+     "country": "India",
+     "devfolio_official": null,
+     "featured": null,
+     "private": false,
+     "starts_at": "2026-11-20T03:30:00+00:00",
+     "hosted_by": null,
+     "hashtags": [],
+     "apply_mode": "both",
+     "city": "Soladevanahalli",
+     "timezone": "Asia/Calcutta",
+     "rating": 0,
+     "type": "HACKATHON",
+     "uuid": "0dab52b6085941a6b366b2425310d8b8",
+     "sponsor_tiers": [],
+     "themes": [],
+     "hackathon_setting": {
+      "winner_announce_at": null,
+      "reg_starts_at": "2026-10-18T03:30:00+00:00",
+      "winner_announced": false,
+      "women_only": false,
+      "reg_ends_at": "2026-11-10T11:00:00+00:00",
+      "external_apply_url": null,
+      "primary_color": "#8ed1fc",
+      "uuid": "1fab9d00bafb457dbd2f42e1f85f3072",
+      "contact_email": "redacted@example.com",
+      "review": false,
+      "logo": "https://assets.devfolio.co/hackathons/0dab52b6085941a6b366b2425310d8b8/assets/logo/847.png",
+      "subdomain": "the-big-hack-2"
+     },
+     "ends_at": "2026-11-20T19:15:00+00:00",
+     "is_online": false,
+     "state": "Karnataka",
+     "slug": "the-big-hack-2",
+     "team_min": 2,
+     "themed": false,
+     "discover": false,
+     "participants_count": 539,
+     "hackathon_faqs": [],
+     "participants_details": [],
+     "team_size": 4,
+     "verified": true,
+     "prizes": [
+      {
+       "parent_prize_uuid": null,
+       "name": "Overall Hackathon Prize",
+       "is_sponsor_prize": false,
+       "uuid": "0dadf3f190894824a1c852571f604a1f",
+       "desc": "Awarded to the top 3 overall projects across all tracks (1st: ₹25,000 | 2nd: ₹15,000 | 3rd: ₹10,000)"
+      }
+     ],
+     "projects_submitted": 0,
+     "name": "THE BIG HACK 2.0",
+     "tagline": "National Level Tech Fest",
+     "location": "Acharya Institute of Technology, Acharya College Main Road, Soladevanahalli, Bengaluru, Karnataka, India",
+     "judges": [],
+     "cover_img": null,
+     "desc": "Welcome to Tech Habba 2.0 One Fest. Countless Ideas. Infinite Possibilities. Tech Habba 2.0 is a National-Level Technical Fest hosted at Acharya Institutes, Bengaluru, from November 19–21, 2026. Bring",
+     "status": "publish",
+     "user_hackathon": null,
+     "user_hackathon_reminder": null
+    }
+   },
+   {
+    "_source": {
+     "country": "India",
+     "devfolio_official": null,
+     "featured": null,
+     "private": false,
+     "starts_at": "2026-11-21T06:30:00+00:00",
+     "hosted_by": null,
+     "hashtags": [],
+     "apply_mode": "both",
+     "city": "Kolkata",
+     "timezone": "Asia/Calcutta",
+     "rating": 0,
+     "type": "HACKATHON",
+     "uuid": "40f5203a0b9842038b51dd3f73236690",
+     "sponsor_tiers": [],
+     "themes": [
+      {
+       "name": "Design",
+       "verified": true,
+       "uuid": "6d18c73b2609447098e347382e471d44"
+      }
+     ],
+     "hackathon_setting": {
+      "winner_announce_at": null,
+      "reg_starts_at": "2026-09-27T04:30:00+00:00",
+      "winner_announced": false,
+      "women_only": false,
+      "reg_ends_at": "2026-11-15T18:29:00+00:00",
+      "external_apply_url": null,
+      "primary_color": "#b026ff",
+      "uuid": "430f4364950e4027a24e407b760c2a23",
+      "contact_email": "redacted@example.com",
+      "review": false,
+      "logo": "https://assets.devfolio.co/hackathons/40f5203a0b9842038b51dd3f73236690/assets/logo/897.png",
+      "subdomain": "genarrative-clash"
+     },
+     "ends_at": "2026-11-21T12:15:00+00:00",
+     "is_online": false,
+     "state": "West Bengal",
+     "slug": "genarrative-clash",
+     "team_min": 2,
+     "themed": false,
+     "discover": false,
+     "participants_count": 1384,
+     "hackathon_faqs": [
+      {
+       "question": "Is there any registration fee to participate in GeNarrative Clash?",
+       "answer": "**No, participation is completely free!** There are no entry fees or hidden costs to register, build, or compete in the hackathon.",
+       "uuid": "895513c47690438baf90cdf1eb17d252"
+      },
+      {
+       "question": "Who can participate? Is the hackathon open to working professionals?",
+       "answer": "**GeNarrative Clash** is exclusively for currently enrolled university and college students. Working professionals are not eligible to compete as participants, though they are **welcome to join us as mentors or judges.**",
+       "uuid": "cd05603970384c49b018002e22304324"
+      },
+      {
+       "question": "Do I need to be a Computer Science student to participate?",
+       "answer": "**Not at all!** Since this hackathon merges Generative AI with the creative arts, we strongly encourage students from design, media, literature, and other non-technical backgrounds to form teams with developers. **Diverse perspectives build the best tools.**",
+       "uuid": "08090aa8266d439f86b49f1c971568e3"
+      },
+      {
+       "question": "Can our team have members from different colleges or universities?",
+       "answer": "**Yes, Cross-college and inter-disciplinary teams are absolutely allowed.** As long as every member is a currently enrolled student, you can team up with anyone you want.",
+       "uuid": "6b5c94e7e8464f67a447eb35d407ff0b"
+      },
+      {
+       "question": "What is the allowed team size?",
+       "answer": "Teams can consist of anywhere from **2 to 4 members**. We highly recommend having a mix of technical developers and creative designers on your squad.",
+       "uuid": "be915bee52e648289797e03fde6e6bdd"
+      },
+      {
+       "question": "Is the hackathon held entirely online or in person?",
+       "answer": "**It is a hybrid event.** The first round is online, where you will build and submit your 50% project prototype in between November 10th to November 16th . **The top 150** shortlisted teams will then be invited to Techno India University, Kolkata, on November 21st for the offline 6-hour hack sprint and live final pitches.",
+       "uuid": "80e2e2a2f3dc438ca0f52c8d50a7e23e"
+      }
+     ],
+     "participants_details": [],
+     "team_size": 4,
+     "verified": true,
+     "prizes": [],
+     "projects_submitted": 0,
+     "name": "GeNarrative Clash",
+     "tagline": "Where Generative AI Meets Human Creativity: Kolkata's Ultimate Prompt Engineering Challenge",
+     "location": "Techno India University, EM Block, Sector V, Bidhannagar, Kolkata, West Bengal 700091, India",
+     "judges": [],
+     "cover_img": null,
+     "desc": "# GeNarrative Clash 2026 *Where Generative AI Meets Human Creativity* Are you ready to redefine how stories are told, music is composed, and digital art is created? **GeNarrative Clash** is Kolkata's ",
+     "status": "publish",
+     "user_hackathon": null,
+     "user_hackathon_reminder": null
+    }
+   }
+  ]
+ }
+}
