@@ -4,7 +4,8 @@ skills.json and basic-memory MCP entry). Everything it replaces is backed up fir
 
   py -3 scripts/install_windows.py [--dry-run] [--shared-only]
 
-Adds the permissions.allow rules of personal/settings.permissions.json that are missing (never removes any).
+Adds the permissions.allow rules of personal/settings.permissions.json that are missing and removes its 'retired'
+ones (never touches other rules).
 Leaves alone: other settings keys (theme, the rest of permissions...), ~/.claude/skills/synced, tools/, projects/, any
 skill that is not in this repo (reported, not deleted).
 """
@@ -21,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGENTS, DEST, GEMINI_CONFIG,  # noqa: E402
                        HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, env_block, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
-                       missing_allow_rules, read_json_file, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
+                       missing_allow_rules, read_json_file, retired_allow_rules, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
                        writer_task_drift, dirty_tree_note, rule_sources)
 
 
@@ -159,11 +160,11 @@ def main():
         if env_block() is not None:
             want["env"] = env_block()
         changed = [k for k, v in want.items() if settings.get(k) != v]
-        new_rules = missing_allow_rules(settings)
-        if new_rules:
-            # add only the repo's rules; the user's own permissions entries stay
+        new_rules, old_rules = missing_allow_rules(settings), retired_allow_rules(settings)
+        if new_rules or old_rules:
+            # add the repo's rules and drop its retired ones; the user's own permissions entries stay
             perms = dict(settings.get("permissions") or {})
-            perms["allow"] = list(perms.get("allow") or []) + new_rules
+            perms["allow"] = [r for r in perms.get("allow") or [] if r not in old_rules] + new_rules
             want["permissions"] = perms
             changed.append("permissions")
         if changed:
