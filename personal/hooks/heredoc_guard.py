@@ -53,8 +53,10 @@ def main():
         "permissionDecision": "deny",
         "permissionDecisionReason": (
             f"[heredoc-guard] This Bash command has a {body}-line heredoc (limit {MAX_BODY_LINES}). "
-            "Long heredocs break on quotes and Windows paths. Write the content with the Write tool "
-            "(the target file itself, or a script in the scratchpad), then run it with a short Bash command."),
+            "Long heredocs break on quotes and Windows paths. Next step, in 2 calls: (1) Write tool: put the "
+            "body in the target file itself, or in a script in the scratchpad (e.g. <scratchpad>/step.sh or "
+            "step.py); (2) Bash: run it with one short command (`bash <path>` or `py -3 <path>`). "
+            "Do not retry with a shorter heredoc or split it into several heredocs."),
     }
     sys.stdout.write(json.dumps({"hookSpecificOutput": out}))
 

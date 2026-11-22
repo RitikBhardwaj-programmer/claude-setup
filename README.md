@@ -26,6 +26,7 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 
 - **1 helper agent** (a second Claude with its own fresh memory that does one job and reports back):
   - **design-review**: checks a finished screen like a senior designer would (flows, three screen sizes, polish, accessibility, error and empty states) and lists problems from "Blocker" to "Nit". It only reports; it never changes your code. Adapted from [OneRedOak/claude-code-workflows](https://github.com/OneRedOak/claude-code-workflows) (MIT licence).
+- **Rule files** in `rules/` (extra rulebook pages for one topic, e.g. `graphify.md`). The installer copies them to `~/.claude/rules/`, and Claude reads them in every session, like `CLAUDE.md`. This keeps the main rulebook short.
 - **3 plugins** (a ready-made add-on; two from Anthropic's official plugin store, one from this repo):
   - **frontend-design**: Anthropic's own design skill that pushes Claude towards bold, distinctive designs instead of the average look. The installer adds it for you with `claude plugin install`.
   - **claude-security**: Anthropic's multi-agent vulnerability scanner. Run `/claude-security` in a repo to scan it and get a report (and optional patch files you apply yourself).
@@ -104,6 +105,7 @@ This repo is the **source of truth** for my Claude setup. I never edit `~/.claud
 | `personal/skills/` | Skills tied to my projects (lab-experiment-log) | Windows only |
 | `personal/hooks/`, `personal/settings.hooks.json` | Hook scripts (PDF router, secret scan before publishing, long-heredoc guard, agent-desktop guard, retro nudge, handoff reminder) and their registration | Windows only |
 | `personal/settings.skill-overrides.json` | The `skillOverrides` block of `settings.json`: skills listed to Claude by name only, to save tokens on every response | Windows only |
+| `personal/settings.permissions.json` | `permissions.allow` rules the installer adds to `settings.json` when missing (it never removes your own): the vault health check and `git -C C:\Users\DELL\Brain`, so the unattended weekly brain review does not stop at a prompt | Windows only |
 | `personal/setup.json` | Per-machine paths read by the portable skills (Python, retro notes, notes repo, this repo) | Windows only |
 | `shared/agent-bridge-rules.md` | The short rules block (handoff protocol, one writer per file set, never wrap another vendor's agent) that the Windows installer merges into `~/.codex/AGENTS.md` | Windows only (for now) |
 | `scripts/` | Windows installer logic and the drift check | — |

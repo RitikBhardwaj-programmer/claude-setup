@@ -34,6 +34,14 @@ for f in "$SRC"/agents/*.md; do
     backup "$DEST/agents/$a" "$BACKUP/agents/$a"
   fi
 done
+for f in "$SRC"/rules/*.md; do
+  [ -f "$f" ] || continue
+  r="$(basename "$f")"
+  if [ -f "$DEST/rules/$r" ]; then
+    mkdir -p "$BACKUP/rules"
+    backup "$DEST/rules/$r" "$BACKUP/rules/$r"
+  fi
+done
 
 # 2. Install
 cp "$SRC/CLAUDE.md" "$DEST/CLAUDE.md"
@@ -42,6 +50,11 @@ for s in $SKILLS; do
   cp -R "$SRC/skills/$s" "$DEST/skills/$s"
 done
 cp "$SRC"/agents/*.md "$DEST/agents/"
+for f in "$SRC"/rules/*.md; do
+  [ -f "$f" ] || continue
+  mkdir -p "$DEST/rules"
+  cp "$f" "$DEST/rules/"
+done
 plugin_note=""
 if command -v claude >/dev/null 2>&1; then
   # token-saver comes from this repo, used as a local marketplace named claude-setup
@@ -63,6 +76,7 @@ echo "Installed into $DEST:"
 echo "  - CLAUDE.md"
 for s in $SKILLS; do echo "  - skills/$s"; done
 for f in "$SRC"/agents/*.md; do echo "  - agents/$(basename "$f")"; done
+for f in "$SRC"/rules/*.md; do [ -f "$f" ] || continue; echo "  - rules/$(basename "$f")"; done
 if [ -n "$plugin_note" ]; then
   echo ""
   echo "These plugins were not installed. Run this for each one:  claude plugin install <name>"

@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 DEST = Path.home() / ".claude"
 PERSONAL = REPO / "personal"
-IGNORE = {"__pycache__", ".DS_Store"}
+IGNORE = {"__pycache__", ".pytest_cache", ".DS_Store"}
 # Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
 PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official",
            "token-saver@claude-setup"]
@@ -66,6 +66,16 @@ def agent_sources():
     """Subagent definitions (agents/*.md) the repo installs into ~/.claude/agents."""
     d = REPO / "agents"
     return sorted(d.glob("*.md")) if d.is_dir() else []
+
+
+def rule_sources(with_personal: bool):
+    """Rule files (rules/*.md, plus personal/rules/*.md on this PC) the repo installs into ~/.claude/rules.
+
+    Claude Code loads ~/.claude/rules/*.md in every session (with `paths:` frontmatter: when a matching
+    file is read or edited). A personal rule with the same name as a shared one replaces it.
+    """
+    dirs = [REPO / "rules"] + ([PERSONAL / "rules"] if with_personal else [])
+    return {p.name: p for d in dirs if d.is_dir() for p in sorted(d.glob("*.md"))}
 
 
 def installed_plugins():
@@ -136,6 +146,18 @@ def env_block():
     return json.loads(f.read_text(encoding="utf-8"))["env"] if f.is_file() else None
 
 
+def permissions_allow_block():
+    """permissions.allow entries the repo requires in settings.json, or [] when it manages none."""
+    f = PERSONAL / "settings.permissions.json"
+    return json.loads(f.read_text(encoding="utf-8"))["allow"] if f.is_file() else []
+
+
+def missing_allow_rules(settings: dict) -> list:
+    """Repo permissions.allow entries that settings does not have yet (other entries are the user's)."""
+    have = (settings.get("permissions") or {}).get("allow") or []
+    return [r for r in permissions_allow_block() if r not in have]
+
+
 def commits_behind_origin(repo=REPO, base="main"):
     """How many commits origin/base has that this checkout lacks, or None if git cannot tell.
 
@@ -163,6 +185,36 @@ def stale_checkout_warning(repo=REPO, base="main"):
     return (f"WARNING: this checkout is {behind} commit(s) behind origin/{base}, so it installs an older setup. "
             f'"In sync" only compares ~/.claude with this checkout. '
             f"Update from origin/{base}, then run the installer again.")
+
+
+def uncommitted_files(repo=REPO):
+    """`git status --porcelain` lines (modified, staged or untracked files), or [] if git cannot tell.
+
+    An installed but uncommitted change looks "in sync", because drift compares the working tree.
+    """
+    try:
+        out = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=15, check=True).stdout
+        return [line for line in out.splitlines() if line.strip()]
+    except (OSError, subprocess.SubprocessError):
+        return []
+
+
+def dirty_tree_note(repo=REPO, limit=10):
+    """A note listing uncommitted files in the repo, else an empty string."""
+    dirty = uncommitted_files(repo)
+    if not dirty:
+        return ""
+    try:
+        branch = subprocess.run(["git", "-C", str(repo), "branch", "--show-current"], capture_output=True,
+                                text=True, timeout=15, check=True).stdout.strip() or "detached HEAD"
+    except (OSError, subprocess.SubprocessError):
+        branch = "unknown branch"
+    lines = [f"Note: {len(dirty)} uncommitted file(s) on {branch} (installed but not in git; commit them):"]
+    lines += [f"  {line}" for line in dirty[:limit]]
+    if len(dirty) > limit:
+        lines.append(f"  ... and {len(dirty) - limit} more")
+    return "\n".join(lines)
 
 
 def tree_diff(src: Path, dst: Path):
@@ -213,6 +265,14 @@ def drift(with_personal: bool):
         live = DEST / "agents" / a.name
         if not live.is_file() or live.read_bytes().replace(b"\r\n", b"\n") != a.read_bytes().replace(b"\r\n", b"\n"):
             found.append(f"agents/{a.name}: missing or changed in ~/.claude")
+    rules = rule_sources(with_personal)
+    for name, src in rules.items():
+        live = DEST / "rules" / name
+        if not live.is_file() or live.read_bytes().replace(b"\r\n", b"\n") != src.read_bytes().replace(b"\r\n", b"\n"):
+            found.append(f"rules/{name}: missing or changed in ~/.claude")
+    live_rules = {p.name for p in (DEST / "rules").glob("*.md")} if (DEST / "rules").is_dir() else set()
+    for extra in sorted(live_rules - set(rules)):
+        found.append(f"rules/{extra}: exists in ~/.claude but not in the repo")
     have = installed_plugins()
     if have is None:
         found.append("plugins: cannot check (the `claude` CLI is not on PATH)")
@@ -239,6 +299,8 @@ def drift(with_personal: bool):
         env = env_block()
         if env is not None and live_settings.get("env") != env:
             found.append("settings.json: env differs from personal/settings.env.json")
+        for rule in missing_allow_rules(live_settings):
+            found.append(f"settings.json: permissions.allow lacks {rule} (personal/settings.permissions.json)")
         sj = PERSONAL / "setup.json"
         live_sj = DEST / "setup.json"
         if sj.is_file() and (not live_sj.is_file() or

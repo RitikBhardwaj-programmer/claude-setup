@@ -5,8 +5,9 @@
 Run it before changing the setup (to catch edits made directly in ~/.claude) and after install.
 Fix drift by copying the live change INTO the repo (if it should be kept) and running the installer.
 
-It also lists local branches with work that is not on main. This is a note, not drift: the exit code
-does not change. Drift compares only the checked-out tree, so unmerged fixes are invisible to it.
+It also lists local branches with work that is not on main, and uncommitted files in the repo.
+These are notes, not drift: the exit code does not change. Drift compares only the checked-out
+working tree, so unmerged and uncommitted fixes are invisible to it.
 """
 import argparse
 import subprocess
@@ -14,7 +15,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from setup_lib import PERSONAL, drift, stale_checkout_warning  # noqa: E402
+from setup_lib import PERSONAL, dirty_tree_note, drift, stale_checkout_warning  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -53,6 +54,9 @@ def main():
         print(f"Note: {len(branches)} local branch(es) have work not on main:")
         for name, count in branches:
             print(f"  - {name}: {count} commit(s)")
+    note = dirty_tree_note()
+    if note:
+        print(note)
     warning = stale_checkout_warning()
     if warning:
         print(warning)

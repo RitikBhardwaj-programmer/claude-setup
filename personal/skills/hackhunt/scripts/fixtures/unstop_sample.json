@@ -1,0 +1,585 @@
+{
+ "data": {
+  "current_page": 1,
+  "data": [
+   {
+    "id": 1803074,
+    "public_url": "hackathons/ideathon-futurex-innovating-for-global-challenges-skill2career-1803074",
+    "title": "IDEATHON- FutureX: Innovating for Global Challenges",
+    "organization_id": 2077110,
+    "type": "hackathons",
+    "subtype": "online_coding_challenge",
+    "regn_open": 1,
+    "updated_at": "2026-11-09T23:26:41+05:30",
+    "region": "online",
+    "visibility": "public",
+    "details": "<p><strong>FUTUREX 2026 &ndash; Innovating for Global Challenges</strong></p> <p>What if your idea could help solve a real-world problem and contribute to a better future?</p> <p>Skill2Career, Ed-Tech platform presents <strong>FutureX 2026</strong>, an <strong>innovation-driven Ideathon</strong> tha",
+    "short_id": "N9boUQ3",
+    "organisation": {
+     "id": 2077110,
+     "name": "Skill2Career",
+     "public_url": "c/skill2career-2077110",
+     "show_evaluator_login_link": false,
+     "official_email_domains": null,
+     "tier": null
+    },
+    "seo_url": "https://unstop.com/hackathons/ideathon-futurex-innovating-for-global-challenges-skill2career-1803074",
+    "status": "LIVE",
+    "tags": [],
+    "thumb": null,
+    "isPaid": false,
+    "festival": null,
+    "prizes": [],
+    "address_with_country_logo": {
+     "id": 1900754,
+     "address": "",
+     "city": "",
+     "state": "",
+     "country": null,
+     "zip": null,
+     "lat": null,
+     "lng": null,
+     "addressable_id": 1803074,
+     "addressable_type": "App\\Model\\Opportunity",
+     "created_at": "2026-11-09T21:02:18+05:30",
+     "updated_at": "2026-11-09T23:26:31+05:30",
+     "deleted_at": null,
+     "address_title": "event_location",
+     "city_id": null,
+     "sort_order": 1,
+     "state_code": null,
+     "country_code": null
+    },
+    "short_url": "https://unstop.com/o/N9boUQ3",
+    "assignedTag": {
+     "tag": null
+    },
+    "payment_services": [],
+    "filters": [
+     {
+      "id": 420,
+      "name": "All",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": "all",
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/all.svg"
+     }
+    ],
+    "required_skills": [
+     {
+      "id": 645879,
+      "skill": "Creative Thinking",
+      "skill_name": "Creative Thinking"
+     },
+     {
+      "id": 1373,
+      "skill": "Problem Solving",
+      "skill_name": "Problem Solving"
+     },
+     {
+      "id": 646411,
+      "skill": "Innovation Management",
+      "skill_name": "Innovation Management"
+     },
+     {
+      "id": 645969,
+      "skill": "Design Thinking",
+      "skill_name": "Design Thinking"
+     },
+     {
+      "id": 647463,
+      "skill": "Sustainability Practices",
+      "skill_name": "Sustainability Practices"
+     }
+    ],
+    "locations": [],
+    "end_date": "2026-12-18T00:00:00+05:30",
+    "approved_date": "2026-11-09 23:26:41 GMT+0530",
+    "viewsCount": 3258,
+    "registerCount": 30,
+    "regnRequirements": {
+     "opportunity_id": 1803074,
+     "start_regn_dt": "2026-11-09T00:00:00+05:30",
+     "end_regn_dt": "2026-12-16T00:00:00+05:30",
+     "show_deadline": 1,
+     "min_team_size": 2,
+     "max_team_size": 4,
+     "work_location_type": "city",
+     "eligibility": null,
+     "reg_status": "STARTED",
+     "remainingDaysArray": {
+      "durations": "1",
+      "text": "month left"
+     },
+     "remain_days": "1 month left",
+     "remaining_time": 3070162
+    }
+   },
+   {
+    "id": 1790028,
+    "public_url": "hackathons/zenith26-mlr-institute-of-technology-mlrit-hyderabad-1790028",
+    "title": "Zenith'26",
+    "organization_id": 10510,
+    "type": "hackathons",
+    "subtype": "online_coding_challenge",
+    "regn_open": 1,
+    "updated_at": "2026-11-09T17:40:03+05:30",
+    "region": "offline",
+    "visibility": "public",
+    "details": "<p><strong>Overview</strong></p> <p>Welcome to ZENITH&rsquo;26, a national-level technical event featuring AWS Student Community Day followed by a 2-Day Hackathon, organized by SCOPE Club, MLRIT, Hyderabad.</p> <p><strong>Day 1 &ndash; AWS Student Community Day</strong></p> <ul> <li> <div> <div>Expe",
+    "short_id": "nVtipkH",
+    "organisation": {
+     "id": 10510,
+     "name": "MLR Institute Of Technology (MLRIT), Hyderabad",
+     "public_url": "c/mlr-institute-of-technology-mlrit-hyderabad-placement-interview-competitions-articles-videos-10510",
+     "show_evaluator_login_link": false,
+     "official_email_domains": null,
+     "tier": null
+    },
+    "seo_url": "https://unstop.com/hackathons/zenith26-mlr-institute-of-technology-mlrit-hyderabad-1790028",
+    "status": "LIVE",
+    "tags": [],
+    "thumb": null,
+    "isPaid": true,
+    "festival": null,
+    "prizes": [
+     {
+      "id": 3873181,
+      "rank": "Winners",
+      "cash": 150000,
+      "currency": "fa-rupee",
+      "certificate": 1,
+      "entity_id": 1790028,
+      "entity_type": "App\\Model\\Opportunity",
+      "others": null,
+      "currencyCode": null,
+      "cash_postfix": null,
+      "max_cash": null,
+      "pre_placement_internship": 0,
+      "pre_placement_opportunity": 0,
+      "prize_type": "cash"
+     },
+     {
+      "id": 3873299,
+      "rank": "Everyone",
+      "cash": null,
+      "currency": "fa-rupee",
+      "certificate": 0,
+      "entity_id": 1790028,
+      "entity_type": "App\\Model\\Opportunity",
+      "others": "AWS Swags",
+      "currencyCode": null,
+      "cash_postfix": null,
+      "max_cash": null,
+      "pre_placement_internship": 0,
+      "pre_placement_opportunity": 0,
+      "prize_type": "kind"
+     }
+    ],
+    "address_with_country_logo": {
+     "id": 1887823,
+     "address": "Mlr institute of technology,Dundigal Police Station Road, Hyderabad, Telangana ,500043",
+     "city": "Hyderabad",
+     "state": "Telangana",
+     "country": {
+      "id": 94,
+      "name": "India",
+      "alpha_2": "in",
+      "alpha_3": "ind",
+      "iso": "IN",
+      "iso3": "IND",
+      "numcode": 356,
+      "phonecode": "+91   ",
+      "logos": {
+       "very_small": "https://d8it4huxumps7.cloudfront.net/images/flags/16x16/in.png",
+       "small": "https://d8it4huxumps7.cloudfront.net/images/flags/24x24/in.png",
+       "medium": "https://d8it4huxumps7.cloudfront.net/images/flags/32x32/in.png",
+       "large": "https://d8it4huxumps7.cloudfront.net/images/flags/48x48/in.png",
+       "xlarge": "https://d8it4huxumps7.cloudfront.net/images/flags/64x64/in.png",
+       "xxlarge": "https://d8it4huxumps7.cloudfront.net/images/flags/128x128/in.png"
+      }
+     },
+     "zip": null,
+     "lat": null,
+     "lng": null,
+     "addressable_id": 1790028,
+     "addressable_type": "App\\Model\\Opportunity",
+     "created_at": "2026-11-01T22:31:34+05:30",
+     "updated_at": "2026-11-09T16:44:54+05:30",
+     "deleted_at": null,
+     "address_title": "event_location",
+     "city_id": 132132,
+     "sort_order": 1,
+     "state_code": null,
+     "country_code": null
+    },
+    "short_url": "https://unstop.com/o/nVtipkH",
+    "assignedTag": {
+     "tag": null
+    },
+    "payment_services": [
+     {
+      "id": 753702,
+      "amount": 499,
+      "required": 1,
+      "entity_id": 1790028,
+      "entity_type": "App\\Model\\Opportunity"
+     }
+    ],
+    "filters": [
+     {
+      "id": 422,
+      "name": "Engineering Students",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": "engineering",
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/engineering.svg"
+     },
+     {
+      "id": 424,
+      "name": "Postgraduate",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": "postgraduate",
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/postgraduate.svg"
+     },
+     {
+      "id": 426,
+      "name": "Undergraduate",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": "undergraduate",
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/undergraduate.svg"
+     },
+     {
+      "id": 679,
+      "name": "Fresher",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": "fresher",
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/fresher.svg"
+     },
+     {
+      "id": 4022,
+      "name": "Management",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": null,
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/.svg"
+     },
+     {
+      "id": 4025,
+      "name": "Arts, Commerce, Sciences & Others",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": null,
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/.svg"
+     }
+    ],
+    "required_skills": [
+     {
+      "id": 1373,
+      "skill": "Problem Solving",
+      "skill_name": "Problem Solving"
+     },
+     {
+      "id": 645580,
+      "skill": "Artificial Intelligence (AI)",
+      "skill_name": "Artificial Intelligence (AI)"
+     },
+     {
+      "id": 646619,
+      "skill": "Machine Learning Concepts",
+      "skill_name": "Machine Learning Concepts"
+     },
+     {
+      "id": 645635,
+      "skill": "AWS (Amazon Web Services)",
+      "skill_name": "AWS (Amazon Web Services)"
+     },
+     {
+      "id": 643452,
+      "skill": "Cloud computing",
+      "skill_name": "Cloud computing"
+     },
+     {
+      "id": 647511,
+      "skill": "Teamwork and Collaboration",
+      "skill_name": "Teamwork and Collaboration"
+     }
+    ],
+    "locations": [],
+    "end_date": "2026-12-04T13:30:42+05:30",
+    "approved_date": "2026-11-09 16:23:16 GMT+0530",
+    "viewsCount": 4138,
+    "registerCount": 23,
+    "regnRequirements": {
+     "opportunity_id": 1790028,
+     "start_regn_dt": "2026-11-07T12:30:42+05:30",
+     "end_regn_dt": "2026-12-04T13:30:42+05:30",
+     "show_deadline": 1,
+     "min_team_size": 3,
+     "max_team_size": 4,
+     "work_location_type": "city",
+     "eligibility": "{\"sector\":[\"students\",\"fresher\"],\"engineering\":[\"allCourses\",{\"course\":\"btech\",\"type\":\"engineering\",\"programme\":[\"all\"],\"passoutYear\":[\"all\"],\"specialization\":[\"all\"],\"duration\":4},{\"course\":\"mtech\",\"",
+     "reg_status": "STARTED",
+     "remainingDaysArray": {
+      "durations": 24,
+      "text": " days left"
+     },
+     "remain_days": "24 days left",
+     "remaining_time": 2081829
+    }
+   },
+   {
+    "id": 1802090,
+    "public_url": "hackathons/css-battle-solutions-2k27-army-institute-of-technology-ait-pune-1802090",
+    "title": "CSS Battle",
+    "organization_id": 11526,
+    "type": "hackathons",
+    "subtype": "online_coding_challenge",
+    "regn_open": 1,
+    "updated_at": "2026-11-09T18:38:54+05:30",
+    "region": "online",
+    "visibility": "public",
+    "details": "<p><strong>Rules:</strong></p> <ul> <li>Submission Requirement: Participants must submit both design challenges for their entries to be considered for evaluation. Incomplete submissions will not be assessed.</li> <li>Winner Selection Criteria: The winner will be determined based on the shortest and ",
+    "short_id": "mT0b6ti",
+    "organisation": {
+     "id": 11526,
+     "name": "Army Institute of Technology (AIT), Pune",
+     "public_url": "c/army-institute-of-technology-ait-pune-placement-interview-competitions-articles-videos-11526",
+     "show_evaluator_login_link": false,
+     "official_email_domains": null,
+     "tier": null
+    },
+    "seo_url": "https://unstop.com/hackathons/css-battle-solutions-2k27-army-institute-of-technology-ait-pune-1802090",
+    "status": "LIVE",
+    "tags": [],
+    "thumb": null,
+    "isPaid": false,
+    "festival": {
+     "id": 542997,
+     "name": "SOLUTIONS 2K27",
+     "abbr": null,
+     "organization_id": 2127202,
+     "organisation": {
+      "id": 2127202,
+      "name": "Army Institute of technology, Pune",
+      "logo": null
+     },
+     "start_date": "2027-03-04 23:59:55+05:30",
+     "end_date": "2027-03-14 20:43:55+05:30",
+     "theme_colour": "light-blue_un",
+     "header_type": 0,
+     "footer_type": 0,
+     "public_url": "college-fests/solutions-2k27-army-institute-of-technology-pune-542997",
+     "logoUrl2": "https://d8it4huxumps7.cloudfront.net/uploads/images/festival/logo/150x150/6aec9dd0ebeac_screenshot_2026-11-05_at_8_46_21_pm.png",
+     "regnRequirements": {
+      "id": 2529019,
+      "opportunity_id": null,
+      "festival_id": 542997,
+      "max_team_size": 5,
+      "min_team_size": 5,
+      "start_regn_dt": "2026-11-05T21:30:56+05:30",
+      "end_regn_dt": "2027-03-14T20:43:56+05:30",
+      "show_deadline": 1,
+      "open_for": 0,
+      "college_type": 0,
+      "same_organisation": 1,
+      "study_year_filter": 0,
+      "deleted_at": null,
+      "enable_payment": 0,
+      "reg_amount": null,
+      "payment_for": 0,
+      "service_charge_from": 0,
+      "allow_coupons": 0,
+      "eligibility": null,
+      "payout_data": null,
+      "gender": [
+       "A"
+      ],
+      "vendor_id": null,
+      "verified_email": 1,
+      "verified_mobile": 1,
+      "experience": null,
+      "only_official_domains": null,
+      "enable_verifications": null,
+      "enable_icsfile": null,
+      "proctoring": {
+       "face": false
+      },
+      "gender_diversity": null,
+      "allow_social_login": 1,
+      "allowed_countries": null,
+      "extendedFormData": null,
+      "extendRegForm": null,
+      "screening_round": null,
+      "consent_needed": 0,
+      "invitations_allowed": 0,
+      "registration_limit": null,
+      "same_graduation_year": 0,
+      "same_course": 0,
+      "same_user_type": 0,
+      "can_edit_extended_form": 0,
+      "extend_basic_form": null,
+      "core_req_fields": null,
+      "enable_draft_reg": false,
+      "closed_job_end_date": 0,
+      "reg_restricted": 0,
+      "free_webinar_for_unstop_pro": 0,
+      "email_reply_to": 0,
+      "verified_aadhaar": 0,
+      "verified_aadhaar_face": 0,
+      "player_extended_form": null,
+      "unique_face_verify": false,
+      "resume_parser": 0,
+      "display_compatibility_score": null,
+      "registration_config": {
+       "enable_newsletter_subscription": 0,
+       "one_click_registration": 0
+      },
+      "verified_driving_licence_face": 0,
+      "verified_aadhaar_face_via_digilocker": 0,
+      "audio_capture": 0,
+      "verification_service": 2,
+      "driver_for_proctoring": "aws",
+      "digilocker_verification_service": 1,
+      "allow_specific_cities": false,
+      "enable_data_transfer_to_SAP": 0,
+      "resume_match_config": "[{\"key\": \"work_experience\", \"label\": \"Work Experience\", \"include\": true, \"is_custom\": false, \"weightage\": 17, \"weight_level\": 1}, {\"key\": \"skills\", \"label\": \"Skills\", \"include\": true, \"is_custom\": false, \"weightage\": 17, \"weight_level\": 1}, {\"key\": \"education\", \"label\": \"Education\", \"include\": true, \"is_custom\": false, \"weightage\": 17, \"weight_level\": 1}, {\"key\": \"achievements\", \"label\": \"Achievements\", \"include\": true, \"is_custom\": false, \"weightage\": 17, \"weight_level\": 1}, {\"key\": \"certifications\", \"label\": \"Certifications\", \"include\": true, \"is_custom\": false, \"weightage\": 16, \"weight_level\": 1}, {\"key\": \"projects\", \"label\": \"Projects\", \"include\": true, \"is_custom\": false, \"weightage\": 16, \"weight_level\": 1}]",
+      "limit_type": 1,
+      "work_location_type": "city",
+      "gender_verification": false,
+      "sap_stage_id": null,
+      "has_compatibility_priority": 0,
+      "face_recog_driver": "aws",
+      "face_detect_driver": "aws",
+      "linkedin_verification_requirement": "NONE"
+     },
+     "regn_open": 2
+    },
+    "prizes": [
+     {
+      "id": 3880741,
+      "rank": "1st - 3rd Rank",
+      "cash": 15000,
+      "currency": "fa-rupee",
+      "certificate": 0,
+      "entity_id": 1802090,
+      "entity_type": "App\\Model\\Opportunity",
+      "others": "",
+      "currencyCode": null,
+      "cash_postfix": null,
+      "max_cash": null,
+      "pre_placement_internship": 0,
+      "pre_placement_opportunity": 0,
+      "prize_type": "cash"
+     }
+    ],
+    "address_with_country_logo": {
+     "id": 1899806,
+     "address": "",
+     "city": "",
+     "state": "",
+     "country": null,
+     "zip": null,
+     "lat": null,
+     "lng": null,
+     "addressable_id": 1802090,
+     "addressable_type": "App\\Model\\Opportunity",
+     "created_at": "2026-11-09T09:50:38+05:30",
+     "updated_at": "2026-11-09T22:10:35+05:30",
+     "deleted_at": null,
+     "address_title": "event_location",
+     "city_id": null,
+     "sort_order": 1,
+     "state_code": null,
+     "country_code": null
+    },
+    "short_url": "https://unstop.com/o/mT0b6ti",
+    "assignedTag": {
+     "tag": null
+    },
+    "payment_services": [],
+    "filters": [
+     {
+      "id": 420,
+      "name": "All",
+      "type": "eligible",
+      "subtype": null,
+      "file_name": "all",
+      "domain_id": 0,
+      "icon_url": "https://d8it4huxumps7.cloudfront.net/images/icons/color_icons/all.svg"
+     }
+    ],
+    "required_skills": [
+     {
+      "id": 643560,
+      "skill": "CSS",
+      "skill_name": "CSS"
+     },
+     {
+      "id": 644004,
+      "skill": "HTML",
+      "skill_name": "HTML"
+     },
+     {
+      "id": 645289,
+      "skill": "User Interface (UI) Design",
+      "skill_name": "User Interface (UI) Design"
+     },
+     {
+      "id": 647677,
+      "skill": "Visual Design Principles",
+      "skill_name": "Visual Design Principles"
+     },
+     {
+      "id": 646538,
+      "skill": "Layout Design",
+      "skill_name": "Layout Design"
+     }
+    ],
+    "locations": [],
+    "end_date": "2027-03-01T00:00:00+05:30",
+    "approved_date": "2026-11-09 18:38:54 GMT+0530",
+    "viewsCount": 8576,
+    "registerCount": 85,
+    "regnRequirements": {
+     "opportunity_id": 1802090,
+     "start_regn_dt": "2026-11-09T00:00:00+05:30",
+     "end_regn_dt": "2027-03-01T00:00:00+05:30",
+     "show_deadline": 1,
+     "min_team_size": 1,
+     "max_team_size": 1,
+     "work_location_type": "city",
+     "eligibility": null,
+     "reg_status": "STARTED",
+     "remainingDaysArray": {
+      "durations": "3",
+      "text": "months left"
+     },
+     "remain_days": "3 months left",
+     "remaining_time": 9550203
+    }
+   }
+  ],
+  "first_page_url": "https://unstop.com/api/public/opportunity/search-result?&opportunity=hackathons&oppstatus=open&per_page=15&page=1",
+  "from": 1,
+  "last_page": 13,
+  "last_page_url": "https://unstop.com/api/public/opportunity/search-result?&opportunity=hackathons&oppstatus=open&per_page=15&page=13",
+  "links": [],
+  "next_page_url": "https://unstop.com/api/public/opportunity/search-result?&opportunity=hackathons&oppstatus=open&per_page=15&page=2",
+  "path": "https://unstop.com/api/public/opportunity/search-result?",
+  "per_page": 15,
+  "prev_page_url": null,
+  "to": 15,
+  "total": 194
+ }
+}
