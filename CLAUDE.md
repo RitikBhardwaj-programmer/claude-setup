@@ -120,7 +120,7 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - Update docs, README, and specs when your change makes them inaccurate.
 - Keep CLAUDE.md a living document. After a feature lands, propose updates: new commands, architecture changes, roadmap status.
 - If I correct the same mistake twice, propose adding a rule for it to CLAUDE.md.
-- Only universally applicable rules go in the root CLAUDE.md. Area-specific guidance goes in `.claude/rules/<topic>.md` or a subfolder's `CLAUDE.md`. Keep the root file under ~200 lines, and use "IMPORTANT" rarely.
+- Only universally applicable rules go in the root CLAUDE.md. Area-specific guidance goes in `.claude/rules/<topic>.md` (for all projects: the setup repo's `rules/`, installed to `~/.claude/rules/`, e.g. graphify) or a subfolder's `CLAUDE.md`. Keep the root file under ~200 lines, and use "IMPORTANT" rarely.
 - Don't generate documentation nobody asked for.
 
 ## Context Management
@@ -155,7 +155,3 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - [ ] No secrets, debug code, or unrelated edits
 - [ ] Docs, specs, and CLAUDE.md updated if now inaccurate
 - [ ] Summary given: what changed, how it was verified, assumptions, open issues, suggested next step or commit
-
-## graphify
-If graphify-out/graph.json exists (`/graphify` builds it; follow `~/.claude/skills/graphify/SKILL.md`), answer codebase questions with `graphify query "<q>"`, `graphify path "<A>" "<B>"` or `graphify explain "<concept>"` first: they return a scoped subgraph, much smaller than GRAPH_REPORT.md or raw grep. Use graphify-out/wiki/index.md, if present, for broad navigation. Read GRAPH_REPORT.md only for broad architecture review or when query/path/explain fall short.
-After modifying code, run `graphify update .` (AST-only, no API cost).

@@ -22,7 +22,7 @@ from setup_lib import (BRIDGE_JSON, CLAUDE_DESKTOP_JSON, CLAUDE_JSON, CODEX_AGEN
                        HOME, IGNORE, LOCAL_MARKETPLACES, LOCAL_PLUGIN_DIRS, PERSONAL, local_plugin_drift, PLUGINS, agent_sources, basic_memory_server, claude_mcp_drift,
                        compose_claude_md, drift, env_block, hook_sources, hooks_block, installed_plugins, is_link, merge_block,
                        missing_allow_rules, read_json_file, skill_overrides_block, skill_sources, stale_checkout_warning, want_mcp_json, writer_task_action,
-                       writer_task_drift, dirty_tree_note)
+                       writer_task_drift, dirty_tree_note, rule_sources)
 
 
 def main():
@@ -78,6 +78,17 @@ def main():
         if not a.dry_run:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ag, dst)
+
+    # 2b2. Rules (~/.claude/rules/*.md). Only files the repo owns are written; other files there are left alone.
+    for name, src in rule_sources(personal).items():
+        dst = DEST / "rules" / name
+        if dst.is_file() and dst.read_bytes().replace(b"\r\n", b"\n") == src.read_bytes().replace(b"\r\n", b"\n"):
+            continue
+        save(dst)
+        actions.append(f"rules/{name}")
+        if not a.dry_run:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
 
     # 2c. Marketplace plugins (needs the `claude` CLI)
     have = installed_plugins()

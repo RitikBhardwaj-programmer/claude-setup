@@ -26,6 +26,7 @@ This is my setup for **Claude Code** (the version of Claude that can work with f
 
 - **1 helper agent** (a second Claude with its own fresh memory that does one job and reports back):
   - **design-review**: checks a finished screen like a senior designer would (flows, three screen sizes, polish, accessibility, error and empty states) and lists problems from "Blocker" to "Nit". It only reports; it never changes your code. Adapted from [OneRedOak/claude-code-workflows](https://github.com/OneRedOak/claude-code-workflows) (MIT licence).
+- **Rule files** in `rules/` (extra rulebook pages for one topic, e.g. `graphify.md`). The installer copies them to `~/.claude/rules/`, and Claude reads them in every session, like `CLAUDE.md`. This keeps the main rulebook short.
 - **3 plugins** (a ready-made add-on; two from Anthropic's official plugin store, one from this repo):
   - **frontend-design**: Anthropic's own design skill that pushes Claude towards bold, distinctive designs instead of the average look. The installer adds it for you with `claude plugin install`.
   - **claude-security**: Anthropic's multi-agent vulnerability scanner. Run `/claude-security` in a repo to scan it and get a report (and optional patch files you apply yourself).

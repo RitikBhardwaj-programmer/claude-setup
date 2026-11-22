@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 DEST = Path.home() / ".claude"
 PERSONAL = REPO / "personal"
-IGNORE = {"__pycache__", ".DS_Store"}
+IGNORE = {"__pycache__", ".pytest_cache", ".DS_Store"}
 # Marketplace plugins the setup expects (installed with the `claude` CLI). Keep in sync with PLUGINS in install.sh.
 PLUGINS = ["frontend-design@claude-plugins-official", "claude-security@claude-plugins-official",
            "token-saver@claude-setup"]
@@ -66,6 +66,16 @@ def agent_sources():
     """Subagent definitions (agents/*.md) the repo installs into ~/.claude/agents."""
     d = REPO / "agents"
     return sorted(d.glob("*.md")) if d.is_dir() else []
+
+
+def rule_sources(with_personal: bool):
+    """Rule files (rules/*.md, plus personal/rules/*.md on this PC) the repo installs into ~/.claude/rules.
+
+    Claude Code loads ~/.claude/rules/*.md in every session (with `paths:` frontmatter: when a matching
+    file is read or edited). A personal rule with the same name as a shared one replaces it.
+    """
+    dirs = [REPO / "rules"] + ([PERSONAL / "rules"] if with_personal else [])
+    return {p.name: p for d in dirs if d.is_dir() for p in sorted(d.glob("*.md"))}
 
 
 def installed_plugins():
@@ -255,6 +265,14 @@ def drift(with_personal: bool):
         live = DEST / "agents" / a.name
         if not live.is_file() or live.read_bytes().replace(b"\r\n", b"\n") != a.read_bytes().replace(b"\r\n", b"\n"):
             found.append(f"agents/{a.name}: missing or changed in ~/.claude")
+    rules = rule_sources(with_personal)
+    for name, src in rules.items():
+        live = DEST / "rules" / name
+        if not live.is_file() or live.read_bytes().replace(b"\r\n", b"\n") != src.read_bytes().replace(b"\r\n", b"\n"):
+            found.append(f"rules/{name}: missing or changed in ~/.claude")
+    live_rules = {p.name for p in (DEST / "rules").glob("*.md")} if (DEST / "rules").is_dir() else set()
+    for extra in sorted(live_rules - set(rules)):
+        found.append(f"rules/{extra}: exists in ~/.claude but not in the repo")
     have = installed_plugins()
     if have is None:
         found.append("plugins: cannot check (the `claude` CLI is not on PATH)")
