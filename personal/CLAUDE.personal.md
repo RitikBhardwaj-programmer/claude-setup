@@ -21,6 +21,7 @@ When I bring an idea or ask to build, automate or add something new ("I want to.
 - To read a PDF, follow the pdf-router hook's Marker command (marker venv Python). Bare `py -3` has no `fitz`/PyMuPDF. To write PDFs, use `C:/Users/DELL/.claude/tools/pdf-venv/Scripts/python.exe` (`reportlab`, `pypdf`).
 - If a file shows `â†’`/`â€“`, it is UTF-8 saved as cp1252: repair it with `line.encode("cp1252").decode("utf-8")`, after a backup.
 - Port 8765 belongs to the basic-memory writer. Use another port for dev servers.
+- Git has `core.longpaths=true` globally (set 2026-11-24), so a clone with paths over 260 characters works. If "Filename too long" still appears, check `git config --global core.longpaths`.
 
 ## Knowledge base (Brain vault)
 My long-term notes are in `C:\Users\DELL\Brain` (a junction to `C:\Users\DELL\OneDrive\Brain`), available through the `basic-memory` MCP server (project `brain`) and as plain files.
