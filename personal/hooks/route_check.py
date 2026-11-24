@@ -2,8 +2,9 @@
 
 Fires when the session has edited at least MIN_FILES distinct files (or made MIN_EDITS edit calls)
 with Write/Edit/NotebookEdit, outside ~/.claude and the Brain vault, AND there is no sign of routing:
-no `route` Skill call, no "/route" typed by the user, no "Routing card" in an assistant message.
-Then it blocks the stop once with a reason, so Claude either writes the card for the remaining work
+no `route` Skill call, no "/route" typed by the user, no "Routing card" in an assistant message, and no
+"approved routing card" in a user message (the brief of a session started from an approved plan; the
+route skill puts that phrase in every brief). Then it blocks the stop once with a reason, so Claude either writes the card for the remaining work
 or says in one line why none is needed. Silent on re-entry (stop_hook_active) and after firing once
 (flag file). Thresholds are tuned by later retros.
 """
@@ -17,6 +18,13 @@ MIN_EDITS = 10
 EDIT_TOOLS = {"Write", "Edit", "NotebookEdit"}
 SKIP_PATH_PARTS = ("/.claude/", "/brain/")
 SKILL = "route"
+# A brief that says its phase follows an approved card (route skill, Step 5). The hook's own reason
+# text says "no routing card", which does not match this phrase.
+BRIEF_PHRASE = "approved routing card"
+
+
+def user_routed(text: str) -> bool:
+    return f"/{SKILL}" in text or BRIEF_PHRASE in text.lower()
 
 
 def text_of(block):
@@ -39,7 +47,7 @@ def scan(transcript: Path):
         kind = entry.get("type")
         content = (entry.get("message") or {}).get("content")
         if isinstance(content, str):
-            if kind == "user" and f"/{SKILL}" in content:
+            if kind == "user" and user_routed(content):
                 routed = True
             elif kind == "assistant" and "routing card" in content.lower():
                 routed = True
@@ -61,7 +69,7 @@ def scan(transcript: Path):
                         edits += 1
             elif kind == "assistant" and "routing card" in text_of(b).lower():
                 routed = True
-            elif kind == "user" and f"/{SKILL}" in text_of(b):
+            elif kind == "user" and user_routed(text_of(b)):
                 routed = True
     return files, edits, routed
 

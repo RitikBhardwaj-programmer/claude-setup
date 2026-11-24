@@ -127,7 +127,7 @@ For medium or large changes, prefer an independent review (a reviewer subagent o
 - Read the most relevant docs and files first. Use search instead of reading whole directories. Don't load large or generated files (lockfiles, build output, `node_modules`, virtualenvs, data dumps). Respect `.claudeignore`.
 - Delegate exploration and independent parallel work to subagents, and bring back summaries rather than raw output.
 - Aim for one feature per session. At a natural breakpoint, when context is heavy (~70%), suggest `/compact` or a fresh session. Never compact mid-change.
-- A proposed session card (`own_initiative`) cannot carry a `cwd`, host or preset. For follow-up work in another folder, ask in the wrap-up; on a yes, start it with `user_asked` and the `cwd`. In `wrap_up`, offer only actions listed in the latest `update_plan` result.
+- A proposed session card (`own_initiative`) cannot carry a `cwd`, host or preset. For follow-up work in another folder, ask in the wrap-up; on a yes, start it with `user_asked` and the `cwd`. In `wrap_up`, offer only app actions that the latest `update_plan` result of this turn lists; an earlier result does not count, and when the latest lists none, offer none.
 - Re-read source when unsure instead of trusting memory from earlier in the session. Persist important decisions in specs, plans, or CLAUDE.md, not only in chat.
 
 ## Communication
